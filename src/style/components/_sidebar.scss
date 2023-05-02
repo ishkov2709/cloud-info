@@ -1,0 +1,53 @@
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 88px;
+    padding: 22px 14px;
+    background-color: $whiteThemeBgColor;
+    border-radius: 20px;
+}
+
+nav {
+    margin-bottom: auto;
+}
+
+.top-side-item:not(:last-child) {
+    margin-bottom: 24px;
+}
+
+.side-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 60px;
+    height: 60px;
+    background-color: $whiteThemeBtnColor;
+    color: $whiteThemeIconColor;
+    border-radius: 50%;
+    border: none;
+    transition: background-color 250ms linear, color 250ms linear;
+}
+
+.side-btn:hover,
+.side-btn:focus,
+.side-btn.current {
+    background-color: $whiteThemeBtnAccentColor;
+    color: $whiteThemeIconAccentColor;
+}
+
+.icon-side {
+    fill: currentColor;
+}
+
+
+
+.bot-side-item:first-child {
+    margin-bottom: 10px;
+}
+
+.bot-side-item:first-child .side-btn {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto;
+    color: $whiteThemeIconAccentColor;
+}

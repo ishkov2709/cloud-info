@@ -1,0 +1,14 @@
+body {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.2;
+    color: $whiteThemePrimaTextColor;
+}
+
+header, footer {
+    padding-top: 90px;
+}
+
+svg {
+    fill: $whiteThemePrimaTextColor;
+}

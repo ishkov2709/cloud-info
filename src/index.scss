@@ -1,1 +1,12 @@
 @import '~normalize.css';
+@import './style/base/reset';
+@import './style/base/var';
+@import './style/base/fonts';
+@import './style/components/body';
+@import './style/components/container';
+@import './style/components/sections';
+@import './style/components/sidebar';
+@import './style/components/days';
+@import './style/components/stats';
+@import './style/components/map';
+@import './style/components/cities';

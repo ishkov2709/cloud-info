@@ -1,0 +1,131 @@
+.selecter-box {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.select-days-list {
+    display: flex;
+    gap: 24px;
+    order: 0;
+    margin-right: auto;
+}
+
+.btn-select {
+    color: $whiteThemeThirdTextColor;
+    border: none;
+    background: transparent;
+    transition: color 250ms linear;
+}
+
+.btn-select:hover,
+.btn-select:focus {
+    color: $whiteThemeTitleColor;
+}
+
+.days-list {
+    display: flex;
+    gap: 20px;
+}
+
+.days-item:first-child {
+    background-color: $whiteThemeSecBgColor;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.day-time-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 22px 12px 20px;
+    background-color: $whiteThemeHeadColor;
+}
+
+.day {
+    font-size: 20px;
+    font-weight: 400;
+}
+
+.first-day-content {
+    padding: 18px 32px 26px 32px;
+}
+
+.temperature-wrapper {
+    display: flex;
+    align-items: center;
+    padding: 0 2px;
+    margin-bottom: 18px;
+    gap: 30px;
+}
+
+.temperature-wrapper .temperature {
+    font-size: 64px;
+    font-weight: 400;
+}
+
+.temperature::after {
+    box-sizing: border-box;
+    position: relative;
+    bottom: 40px;
+    left: 5px;
+    display: inline-block;
+    content: '';
+    width: 12px;
+    height: 12px;
+    border: 2px solid $whiteThemeTitleColor;
+    border-radius: 50%;
+}
+
+.weather-info-item {
+    color: $whiteThemeSecTextColor;
+    margin-bottom: 4px;
+}
+
+.weather-info-item:last-child {
+    margin-bottom: 0;
+}
+
+.weather-val {
+    color: $whiteThemeTitleColor;
+}
+
+.btn-more {
+    display: block;
+    margin-left: auto;
+    padding: 2px 10px;
+    background-color: $whiteThemeIconAccentColor;
+    border: 1px solid $accentColor;
+    border-radius: 32px;
+}
+
+.days-item:not(:first-child) {
+    padding: 16px 12px 22px 12px;
+    background-color: $whiteThemeBgColor;
+    text-align: center;
+    border-radius: 20px;
+
+    .icon-weather {
+        margin-bottom: 46px;
+    }
+
+    .temperature {
+        font-size: 36px;
+    }
+
+    .temperature::after {
+        bottom: 20px;
+        left: 5px;
+    }
+}
+
+.days-item:not(:first-child) .day::after {
+    content: '';
+    display: block;
+    margin: 4px auto 68px auto;
+    width: 30px;
+    height: 2px;
+    background-color: $whiteThemeTitleColor;
+    border-radius: 32px;
+}
+
