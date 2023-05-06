@@ -6,7 +6,12 @@ body {
 }
 
 header, footer {
-    padding-top: 90px;
+    padding-top: 25px;
+}
+
+main {
+    position: relative;
+    overflow: hidden;
 }
 
 svg {

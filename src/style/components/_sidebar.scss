@@ -25,12 +25,12 @@ nav {
     color: $whiteThemeIconColor;
     border-radius: 50%;
     border: none;
-    transition: background-color 250ms linear, color 250ms linear;
+    transition: background-color 250ms $timeCubic, color 250ms $timeCubic;
 }
 
 .side-btn:hover,
 .side-btn:focus,
-.side-btn.current {
+.currentBtn {
     background-color: $whiteThemeBtnAccentColor;
     color: $whiteThemeIconAccentColor;
 }

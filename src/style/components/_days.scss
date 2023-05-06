@@ -15,11 +15,12 @@
     color: $whiteThemeThirdTextColor;
     border: none;
     background: transparent;
-    transition: color 250ms linear;
+    transition: color 250ms $timeCubic;
 }
 
 .btn-select:hover,
-.btn-select:focus {
+.btn-select:focus,
+.current {
     color: $whiteThemeTitleColor;
 }
 
@@ -29,6 +30,7 @@
 }
 
 .days-item:first-child {
+    width: 307px;
     background-color: $whiteThemeSecBgColor;
     border-radius: 20px;
     overflow: hidden;
@@ -53,6 +55,7 @@
 
 .temperature-wrapper {
     display: flex;
+    justify-content: center;
     align-items: center;
     padding: 0 2px;
     margin-bottom: 18px;
@@ -86,7 +89,8 @@
     margin-bottom: 0;
 }
 
-.weather-val {
+.weather-val,
+.unit {
     color: $whiteThemeTitleColor;
 }
 
@@ -100,6 +104,7 @@
 }
 
 .days-item:not(:first-child) {
+    width: 88px;
     padding: 16px 12px 22px 12px;
     background-color: $whiteThemeBgColor;
     text-align: center;
