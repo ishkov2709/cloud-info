@@ -5,6 +5,73 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>cloud Info</title>
+    <style>
+      .preloader {
+        position: fixed;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        overflow: hidden;
+        height: 100%;
+        background-image: linear-gradient(
+          to right top,
+          #e7e7e7,
+          #dddddd,
+          #d2d2d2,
+          #c8c8c8,
+          #bebebe
+        );
+        z-index: 1001;
+      }
+
+      .spinner {
+        animation: rotate 2s linear infinite;
+        z-index: 2;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin: -25px 0 0 -25px;
+        width: 50px;
+        height: 50px;
+      }
+
+      .spinner .path {
+        stroke: #414141;
+        stroke-linecap: round;
+        animation: dash 1.5s ease-in-out infinite;
+      }
+
+      @keyframes rotate {
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes dash {
+        0% {
+          stroke-dasharray: 1, 150;
+          stroke-dashoffset: 0;
+        }
+        50% {
+          stroke-dasharray: 90, 150;
+          stroke-dashoffset: -35;
+        }
+        100% {
+          stroke-dasharray: 90, 150;
+          stroke-dashoffset: -124;
+        }
+      }
+
+      .loaded_hiding .preloader {
+        transition: 0.3s opacity;
+        opacity: 0;
+      }
+
+      .loaded .preloader {
+        display: none;
+      }
+    </style>
   </head>
   <body>
     <div class="preloader">
@@ -19,15 +86,6 @@
         ></circle>
       </svg>
     </div>
-    <script>
-      window.onload = function () {
-        document.body.classList.add('loaded_hiding');
-        window.setTimeout(function () {
-          document.body.classList.add('loaded');
-          document.body.classList.remove('loaded_hiding');
-        }, 500);
-      };
-    </script>
     <header></header>
     <div class="container">
       <div class="main-wrapper">
@@ -161,5 +219,14 @@
       </div>
     </div>
     <footer></footer>
+    <script>
+      window.onload = function () {
+        document.body.classList.add('loaded_hiding');
+        window.setTimeout(function () {
+          document.body.classList.add('loaded');
+          document.body.classList.remove('loaded_hiding');
+        }, 500);
+      };
+    </script>
   </body>
 </html>

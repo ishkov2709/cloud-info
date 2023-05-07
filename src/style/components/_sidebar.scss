@@ -51,3 +51,24 @@ nav {
     margin: 0 auto;
     color: $whiteThemeIconAccentColor;
 }
+
+.animated {
+    animation-name: swichColor;
+    animation-duration: 1000ms;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+@keyframes swichColor {
+    0% {
+        color: $whiteThemeIconAccentColor;
+    }
+
+    50% {
+        color: $accentSecColor;
+    }
+
+    100% {
+        color: $whiteThemeIconAccentColor;
+    }
+}

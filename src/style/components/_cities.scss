@@ -15,6 +15,8 @@
 
 .cities-list {
     width: 413px;
+    height: 443px;
+    overflow-y: hidden;
 }
 
 .cities-item {
@@ -57,11 +59,13 @@
 }
 
 .city-stats .temperature {
-    font-size: 36px;
+    text-align: center;
+    font-size: 26px;
 }
 
 .city-stats .temperature::after {
     bottom: 20px;
     left: 0px;
 }
+
 
