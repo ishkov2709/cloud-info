@@ -27,7 +27,7 @@ const refs = {
 
 // Constants
 
-const USERNAME = 'ishanya';
+const APIkey = '2c51583c12e4bfc17c3e270ff322ae2f';
 
 const date = new Date();
 const daysOfWeek = [
@@ -72,21 +72,23 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 // Makers
 
 const makeCitiesByInpuValue = input => {
-  return getLocality(input, USERNAME).then(res => {
-    if (!res.data.geonames.length)
+  return getLocality(input, APIkey).then(res => {
+    if (!res.data.length)
       return Notiflix.Notify.info(
         'На ваш запит немає відповідного результату. Будь ласка, спробуйте ще раз'
       );
-    return res.data.geonames;
+    return res.data;
   });
 };
 
 const makeCities = res => {
   refs.citiesList.innerHTML = '';
-  res.data.geonames.slice(1).forEach((el, i) => {
+  res.data.list.forEach((el, i) => {
     if (i < 3) {
-      getWeather(el.lat, el.lng).then(res => {
+      getWeather(...Object.values(el.coord)).then(res => {
         makeItemCity(
+          res.data.latitude,
+          res.data.longitude,
           el.name,
           res.data.current_weather.weathercode,
           res.data.current_weather.temperature
@@ -96,10 +98,10 @@ const makeCities = res => {
   });
 };
 
-const makeItemCity = (city, weathercode, temp) => {
+const makeItemCity = (lat, lon, city, weathercode, temp) => {
   refs.citiesList.insertAdjacentHTML(
     'beforeend',
-    renderItemCity(city, weathercode, temp)
+    renderItemCity(lat, lon, city, weathercode, temp)
   );
 };
 
@@ -154,13 +156,14 @@ const inputCityHandler = async evt => {
 
 const onClickBtnFetchWeatherDataHandler = evt => {
   const target = evt.target;
-  refs.mapTitle.textContent = target.textContent;
+  refs.mapTitle.textContent = target.textContent
+    .split(',')
+    .slice(0, 1)
+    .join('');
   if (evt.target.classList.contains('search-item')) {
     map.setView([...Object.values(target.dataset)], 13);
     getWeather(...Object.values(target.dataset)).then(makeDays);
-    getNearestCities(...Object.values(target.dataset), USERNAME).then(
-      makeCities
-    );
+    getNearestCities(...Object.values(target.dataset), APIkey).then(makeCities);
     removeActiveClass();
   }
 };
@@ -229,8 +232,8 @@ const renderDaysForecast = res => {
   });
 };
 
-const renderItemCity = (city, weathercode, temp) => {
-  return `<li class="cities-item">
+const renderItemCity = (lat, lon, city, weathercode, temp) => {
+  return `<li class="cities-item" data-lat="${lat}" data-lon="${lon}">
       <div class="city-info-wrapper">
         <h3 class="city">${city}</h3>
         <p class="info">${descriptionWeather(weathercode)}</p>
@@ -247,8 +250,8 @@ const renderItemCity = (city, weathercode, temp) => {
     </li>`;
 };
 
-const renderSearch = ({ lat, lng, name, countryName }) => {
-  return `<li class="search-item" data-lat="${lat}" data-lng="${lng}">${name}, ${countryName}</li>`;
+const renderSearch = ({ lat, lon, display_name }) => {
+  return `<li class="search-item" data-lat="${lat}" data-lng="${lon}">${display_name}</li>`;
 };
 
 const renderStatistic = res => {
@@ -292,8 +295,8 @@ const animatedStatsMark = (value, i) => {
 // Base GET request
 
 getWeather(50.45, 30.53).then(makeDays);
-getNearestCities(50.45, 30.53, USERNAME).then(makeCities);
-refs.mapTitle.innerHTML = 'Київ, Україна';
+getNearestCities(50.45, 30.53, APIkey).then(makeCities);
+refs.mapTitle.innerHTML = 'Київ';
 
 // Listeners
 

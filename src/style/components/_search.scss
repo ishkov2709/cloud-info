@@ -1,0 +1,63 @@
+.backdrop {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background-color: $whiteThemeSecBgColor;
+    z-index: 1000;
+    pointer-events: none;
+    visibility: hidden;
+    transition: left 250ms $timeCubic, visibility 250ms $timeCubic;
+}
+
+.js-backdrop.active {
+    pointer-events: all;
+    visibility: visible;
+    left: 0%;
+
+}
+
+.modal {
+    padding-top: 80px;
+}
+
+.modal-form {
+    margin: 0 auto 24px auto;
+    text-align: center;
+}
+
+.search-formfied {
+    position: relative;
+    display: inline-block;
+}
+
+.input-search,
+.search-item {
+    width: 734px;
+    padding: 28px 56px 28px 24px;
+    font-size: 24px;
+    background-color: $whiteThemeInputColor;
+    color: $whiteThemeIconAccentColor;
+    border: none;
+    border-radius: 25px;
+    outline: none;
+}
+
+.icon-input {
+    position: absolute;
+    top: 50%;
+    right: 30px;
+    transform: translateY(-50%);
+    fill: $whiteThemeIconAccentColor;
+}
+
+.search-item {
+    margin: 0 auto 24px auto;
+    font-size: 20px;
+    background-color: $whiteThemeSearchItemsColor;
+}
+
+.search-item:last-child {
+    margin: 0 auto;
+}
