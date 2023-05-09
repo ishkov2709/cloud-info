@@ -1,7 +1,9 @@
 @import '~normalize.css';
 @import './style/base/reset';
-@import './style/base/var';
+@import './style/base/vars';
 @import './style/base/fonts';
+@import './style/utils/placeholders';
+@import './style/utils/mixins';
 @import './style/components/body';
 @import './style/components/container';
 @import './style/components/sections';
@@ -10,4 +12,6 @@
 @import './style/components/stats';
 @import './style/components/map';
 @import './style/components/cities';
+@import './style/components/backdrop';
 @import './style/components/search';
+@import './style/components/settings';

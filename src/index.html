@@ -93,7 +93,7 @@
           <nav>
             <ul class="top-side-list">
               <li class="top-side-item">
-                <button class="side-btn currentBtn" type="button" data-main="">
+                <button class="side-btn current-btn" type="button" data-main="">
                   <svg class="icon-side" width="24" height="24">
                     <use href="./img/icons.svg#main"></use>
                   </svg>
@@ -203,7 +203,7 @@
             <ul class="cities-list js-cities-list"></ul>
           </section>
           <div class="backdrop js-backdrop">
-            <div class="modal">
+            <div class="modal-search" data-modal="search">
               <form class="modal-form js-form">
                 <label class="search-formfied">
                   <input class="input-search" type="text" name="search" />
@@ -213,6 +213,34 @@
                 </label>
               </form>
               <ul class="search-list js-search-list"></ul>
+            </div>
+            <div class="modal-settings" data-modal="settings">
+              <ul class="geo-lang-list">
+                <li><h2 class="set-title title">Country</h2></li>
+                <li><h2 class="set-title title">Language</h2></li>
+                <li><h2 class="set-title title">Backyard</h2></li>
+              </ul>
+              <ul class="theme-list js-themes">
+                <li class="theme-item">
+                  <button
+                    class="theme-btn current-theme"
+                    type="button"
+                    name="btn-white"
+                  >
+                    <span class="blackout"></span>
+                  </button>
+                </li>
+                <li class="theme-item">
+                  <button class="theme-btn" type="button" name="btn-dark">
+                    <span class="blackout"></span>
+                  </button>
+                </li>
+                <li class="theme-item">
+                  <button class="theme-btn" type="button" name="btn-paleblue">
+                    <span class="blackout"></span>
+                  </button>
+                </li>
+              </ul>
             </div>
           </div>
         </main>

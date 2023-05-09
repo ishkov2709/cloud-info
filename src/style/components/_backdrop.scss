@@ -1,0 +1,27 @@
+.backdrop {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background-color: $whiteThemeSecBgColor;
+    z-index: 1000;
+    pointer-events: none;
+    visibility: hidden;
+    transition: left 250ms $timeCubic, visibility 250ms $timeCubic;
+}
+
+.dark .backdrop {
+    background-color: $darkThemeBodyBgColor;
+
+}
+
+.paleblue .backdrop {
+    background-color: $paleblueThemeBodyBgColor;
+}
+
+.js-backdrop.active {
+    pointer-events: all;
+    visibility: visible;
+    left: 0%;
+}

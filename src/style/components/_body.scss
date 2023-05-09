@@ -2,7 +2,18 @@ body {
     font-family: 'Inter', sans-serif;
     font-size: 16px;
     line-height: 1.2;
+    background-color: $whiteThemeIconAccentColor;
     color: $whiteThemePrimaTextColor;
+}
+
+body.dark {
+    background-color: $darkThemeBodyBgColor;
+    color: $darkThemePrimaTextColor;
+}
+
+body.paleblue {
+    background-color: $paleblueThemeBodyBgColor;
+    color: $whiteThemeTitleColor;
 }
 
 header, footer {
@@ -16,4 +27,8 @@ main {
 
 svg {
     fill: $whiteThemePrimaTextColor;
+}
+
+.dark svg {
+    fill: $darkThemePrimaTextColor;
 }

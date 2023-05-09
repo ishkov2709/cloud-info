@@ -14,3 +14,8 @@ main {
     border: 1px solid $whiteThemeTitleColor;
     border-radius: 32px;
 }
+
+.dark .title {
+    color: $darkThemeTitleColor;
+    border-color: $darkThemeTitleColor;
+}

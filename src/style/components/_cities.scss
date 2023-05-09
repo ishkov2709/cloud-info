@@ -13,6 +13,10 @@
     border: none;
 }
 
+.dark .btn-show-all {
+    color: $darkThemeTitleColor;
+}
+
 .cities-list {
     width: 413px;
     height: 443px;
@@ -29,6 +33,14 @@
     padding: 14px 24px;
     background-color: $whiteThemeBgColor;
     border-radius: 20px;
+}
+
+.dark .cities-item {
+    background-color: $darkThemeCardLastDaysBgColor;
+}
+
+.paleblue .cities-item {
+    background-color: $paleblueThemeSidebarBgColor;
 }
 
 .cities-item:last-child {

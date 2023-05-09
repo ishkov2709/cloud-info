@@ -11,7 +11,6 @@ const dashedline = quantity => {
     dashedItem.style.display = 'inline-block';
     dashedItem.style.width = '12px';
     dashedItem.style.height = '5px';
-    dashedItem.style.backgroundColor = '#878787';
     dashedItem.style.borderRadius = '20px';
     dashedlLine.append(dashedItem);
   }

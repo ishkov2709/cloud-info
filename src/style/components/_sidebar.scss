@@ -7,6 +7,14 @@
     border-radius: 20px;
 }
 
+.dark .sidebar {
+    background-color: $darkThemeSidebarBgColor;
+}
+
+.paleblue .sidebar {
+    background-color: $paleblueThemeSidebarBgColor;
+}
+
 nav {
     margin-bottom: auto;
 }
@@ -28,17 +36,20 @@ nav {
     transition: background-color 250ms $timeCubic, color 250ms $timeCubic;
 }
 
+.dark .side-btn {
+    color: $darkThemeSecTextColor;
+}
+
 .side-btn:hover,
 .side-btn:focus,
-.currentBtn {
+.current-btn {
     background-color: $whiteThemeBtnAccentColor;
     color: $whiteThemeIconAccentColor;
 }
 
-.icon-side {
+.side-btn .icon-side {
     fill: currentColor;
 }
-
 
 
 .bot-side-item:first-child {

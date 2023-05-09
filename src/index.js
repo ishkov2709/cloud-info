@@ -15,6 +15,7 @@ import descriptionWeather from './modules/descriptionWeather';
 // References
 
 const refs = {
+  body: document.body,
   humidityList: document.querySelector('.js-humidity-list'),
   sidebar: document.querySelector('.js-sidebar'),
   mapTitle: document.querySelector('.js-title'),
@@ -24,6 +25,7 @@ const refs = {
   daysList: document.querySelector('.js-days-list'),
   citiesList: document.querySelector('.js-cities-list'),
   statsList: document.querySelector('.js-stats-list'),
+  themes: document.querySelector('.js-themes'),
 };
 
 // Constants
@@ -140,11 +142,30 @@ const makeDays = res => {
 
 // Checks
 
-const checkCurrentBtnClass = evt => {
-  if (document.querySelector('.currentBtn')) {
-    document.querySelector('.currentBtn').classList.remove('currentBtn');
-    evt.target.closest('.side-btn').classList.add('currentBtn');
+const checkGeolocation = () => {
+  if (navigator.permissions) {
+    navigator.permissions
+      .query({ name: 'geolocation' })
+      .then(function (result) {
+        if (result.state === 'granted') {
+          return navigator.geolocation.getCurrentPosition(
+            success,
+            error,
+            options
+          );
+        } else if (result.state === 'prompt') {
+          // Пользователь должен разрешить доступ к геопозиции
+        } else {
+          Notiflix.Notify.warning('Доступ до геоданих заборонений');
+        }
+      });
+  } else {
+    Notiflix.Notify.warning(
+      'На жаль браузер не підтримує відстеження геоданих'
+    );
   }
+  refs.mapTitle.innerHTML = 'Київ';
+  fetchPromises(50.45, 30.53);
 };
 
 /**
@@ -155,23 +176,26 @@ const checkCurrentBtnClass = evt => {
 
 const onClickBtnSidebarHandler = evt => {
   if (!evt.target.closest('.side-btn')) return;
-  removeActiveClass();
   const target = Object.keys(evt.target.closest('.side-btn').dataset);
-  checkCurrentBtnClass(evt);
+  if (
+    target.join('') ===
+    Object.keys(document.querySelector('.current-btn').dataset).join('')
+  )
+    return;
+  removeActiveClass();
+  appointCurrentBtn(evt, 'current-btn', 'side-btn');
   if (target.includes('search')) {
-    refs.backdrop.classList.add('active');
+    addActiveClass(0);
     refs.searchList.addEventListener(
       'click',
       onClickItemCityFetchWeatherDataHandler
     );
-    refs.modalform.addEventListener('submit', evt => {
-      evt.preventDefault();
-      if (refs.searchList.children.length) {
-        getDataOnSubmit(refs.searchList.children[0]);
-      }
-    });
+    refs.modalform.addEventListener('submit', onSubmitFormHandler);
   } else if (target.includes('location')) {
     navigator.geolocation.getCurrentPosition(success, error, options);
+  } else if (target.includes('settings')) {
+    addActiveClass(1);
+    refs.themes.addEventListener('click', onClickBtnSwichThemeHandler);
   } else {
     refs.searchList.removeEventListener(
       'click',
@@ -192,10 +216,28 @@ const inputCityHandler = async evt => {
   }
 };
 
+const onSubmitFormHandler = evt => {
+  evt.preventDefault();
+  if (refs.searchList.children.length) {
+    getDataOnSubmit(refs.searchList.children[0]);
+  }
+};
+
 const onClickItemCityFetchWeatherDataHandler = evt => {
   if (evt.target.classList.contains('search-item')) {
     getDataOnSubmit(evt.target);
   }
+};
+
+const onClickBtnSwichThemeHandler = evt => {
+  if (!evt.target.closest('.theme-btn')) return;
+  appointCurrentBtn(evt, 'current-theme', 'theme-btn');
+  removeTheme();
+  if (evt.target.closest('.theme-btn').name === 'btn-white') return;
+  if (evt.target.closest('.theme-btn').name === 'btn-dark')
+    document.body.classList.add('dark');
+  if (evt.target.closest('.theme-btn').name === 'btn-paleblue')
+    document.body.classList.add('paleblue');
 };
 
 /**
@@ -312,8 +354,9 @@ const getHumidity = res => {
 };
 
 const removeActiveClass = () => {
-  if (document.querySelector('.active')) {
-    document.querySelector('.active').classList.remove('active');
+  const activeClassEls = document.querySelectorAll('.active');
+  if (activeClassEls.length) {
+    activeClassEls.forEach(el => el.classList.remove('active'));
   }
 };
 
@@ -343,6 +386,11 @@ const clearCitiesList = () => {
   refs.citiesList.innerHTML = '';
 };
 
+const removeTheme = () => {
+  document.body.classList.remove('dark');
+  document.body.classList.remove('paleblue');
+};
+
 const setMapTitleVal = el => {
   refs.mapTitle.textContent = el.textContent.split(',').slice(0, 1).join('');
 };
@@ -350,33 +398,54 @@ const setMapTitleVal = el => {
 const isNumeric = n => n.split('').some(el => Number(el));
 
 const appointMainBtnCurrent = () => {
-  if (document.querySelector('.currentBtn')) {
-    document.querySelector('.currentBtn').classList.remove('currentBtn');
-    document.querySelector('.side-btn').classList.add('currentBtn');
+  if (document.querySelector('.current-btn')) {
+    document.querySelector('.current-btn').classList.remove('current-btn');
+    document.querySelector('.side-btn').classList.add('current-btn');
   }
+};
+
+const addActiveClass = num => {
+  refs.backdrop.classList.add('active');
+  refs.backdrop.children[num].classList.add('active');
+};
+
+const appointCurrentBtn = (evt, prevEl, currentEl) => {
+  if (document.querySelector(`.${prevEl}`)) {
+    document.querySelector(`.${prevEl}`).classList.remove(prevEl);
+    evt.target.closest(`.${currentEl}`).classList.add(prevEl);
+  }
+};
+
+// Geo Foo
+
+const success = async position => {
+  Notiflix.Notify.success(
+    'Доступ до геоданих отримано. Відстежуємо геопозицію'
+  );
+  if (
+    Object.keys(document.querySelector('.current-btn').dataset).includes(
+      'location'
+    )
+  )
+    switchColor(5000);
+  clearCitiesList();
+  const pos = [position.coords.latitude, position.coords.longitude];
+  const res = await getNearestCities(...pos, APIkey);
+  refs.mapTitle.textContent = res.data.list[0].name;
+  fetchPromises(...pos);
+};
+
+const error = error => {
+  Notiflix.Notify.info('Не вдалось отримати геодані');
+  console.log(error);
 };
 
 // Base Locality
 
-refs.mapTitle.innerHTML = 'Київ';
-fetchPromises(50.45, 30.53);
+checkGeolocation();
 
 // Listeners
 
 refs.sidebar.addEventListener('click', onClickBtnSidebarHandler);
 
 refs.modalform.addEventListener('input', _.debounce(inputCityHandler, 500));
-
-async function success(position) {
-  switchColor(5000);
-  clearCitiesList();
-  const pos = [position.coords.latitude, position.coords.longitude];
-  const res = await getNearestCities(...pos, APIkey);
-  refs.mapTitle.textContent = res.data.list[0].name;
-  fetchPromises(...pos);
-}
-
-function error(error) {
-  Notiflix.Notify.info('Не вдалось отримати геодані');
-  console.log(error);
-}

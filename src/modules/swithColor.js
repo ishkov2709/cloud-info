@@ -1,7 +1,9 @@
 const switchColor = time => {
-  document.querySelector('.currentBtn').classList.add('animated');
+  if (document.querySelector('.animated')) return;
+  document.querySelector('.current-btn').classList.add('animated');
   setTimeout(() => {
-    document.querySelector('.currentBtn').classList.remove('animated');
+    console.log('hihihi');
+    document.querySelector('.animated').classList.remove('animated');
   }, time);
 };
 

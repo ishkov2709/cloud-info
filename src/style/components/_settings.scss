@@ -1,0 +1,104 @@
+.modal-settings {
+    width: 738px;
+    height: 452px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 113px 0;
+
+    background-color: $whiteThemeIconAccentColor;
+    border-radius: 25px;
+    border: 5px solid $whiteThemeBorderModalColor;
+
+    pointer-events: none;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 250ms $timeCubic, opacity 250ms $timeCubic;
+}
+
+.dark .modal-settings {
+    background-color: $darkThemeModalSetBgColor;
+}
+
+.modal-settings.active {
+    pointer-events: all;
+    visibility: visible;
+    opacity: 1;
+}
+
+.geo-lang-list {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-bottom: 120px;
+}
+
+.set-title {
+    padding: 0 24px;
+}
+
+.dark .set-title {
+    color: $whiteThemeIconAccentColor;
+    border-color: $whiteThemeIconAccentColor;
+}
+
+.theme-list {
+    display: flex;
+    justify-content: center;
+    gap: 42px;
+}
+
+.theme-btn {
+    position: relative;
+    width: 54px;
+    height: 54px;
+
+    border-radius: 50%;
+    border: 2px solid transparent;
+
+    transition: border 250ms $timeCubic;
+}
+
+.theme-item:nth-child(1) .theme-btn {
+    background: url(../../img/themes/white.png);
+    @include positionBgc;
+}
+
+.theme-item:nth-child(2) .theme-btn {
+    background: url(../../img/themes/dark.png);
+    @include positionBgc;
+}
+
+.theme-item:nth-child(3) .theme-btn {
+    background: url(../../img/themes/paleblue.png);
+    @include positionBgc;
+}
+
+.current-theme {
+    border: 2px solid $whiteThemeTitleColor;
+}
+
+.dark .current-theme {
+    border-color: $whiteThemeIconAccentColor;
+}
+
+.blackout {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: inline-block;
+    width: 55px;
+    height: 55px;
+    background: linear-gradient($whiteThemeBorderModalColor, $whiteThemeBorderModalColor);
+    border-radius: 50%;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 250ms $timeCubic, visibility 250ms $timeCubic;
+}
+
+.current-theme .blackout {
+    visibility: hidden;
+    opacity: 0;
+}

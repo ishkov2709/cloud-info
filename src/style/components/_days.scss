@@ -18,10 +18,27 @@
     transition: color 250ms $timeCubic;
 }
 
+.dark .btn-select {
+    color: $darkThemeRadioBtnColor;
+}
+
+.paleblue .btn-select {
+    color: $paleblueThemeTextColor;
+}
+
 .btn-select:hover,
 .btn-select:focus,
-.current {
+.current,
+.paleblue .btn-select:hover,
+.paleblue .btn-select:focus,
+.paleblue .current {
     color: $whiteThemeTitleColor;
+}
+
+.dark .btn-select:hover,
+.dark .btn-select:focus,
+.dark .current {
+    color: $darkThemeTitleColor;
 }
 
 .days-list {
@@ -34,6 +51,14 @@
     background-color: $whiteThemeSecBgColor;
     border-radius: 20px;
     overflow: hidden;
+}
+
+.dark .days-item:first-child {
+    background-color: $darkThemeCardFirstDayBgColor;
+}
+
+.paleblue .days-item:first-child {
+    background-color: $paleblueThemeCardFirstDayBgColor;
 }
 
 .day-time-wrapper {
@@ -80,9 +105,21 @@
     border-radius: 50%;
 }
 
+.dark .temperature::after {
+    border: 2px solid $darkThemePrimaTextColor;
+}
+
 .weather-info-item {
     color: $whiteThemeSecTextColor;
     margin-bottom: 4px;
+}
+
+.dark .weather-info-item {
+    color: $darkThemeThirdTextColor;
+}
+
+.paleblue .weather-info-item {
+    color: $paleblueThemeTextColor;
 }
 
 .weather-info-item:last-child {
@@ -94,12 +131,17 @@
     color: $whiteThemeTitleColor;
 }
 
+.dark .weather-val,
+.dark .unit {
+    color: $darkThemePrimaTextColor;
+}
+
 .btn-more {
     display: block;
     margin-left: auto;
     padding: 2px 10px;
     background-color: $whiteThemeIconAccentColor;
-    border: 1px solid $accentColor;
+    border: 2px solid $accentColor;
     border-radius: 32px;
 }
 
@@ -124,6 +166,14 @@
     }
 }
 
+.dark .days-item:not(:first-child) {
+    background-color: $darkThemeCardLastDaysBgColor;
+}
+
+.paleblue .days-item:not(:first-child) {
+    background-color: $paleblueThemeSidebarBgColor;
+}
+
 .days-item:not(:first-child) .day::after {
     content: '';
     display: block;
@@ -132,5 +182,9 @@
     height: 2px;
     background-color: $whiteThemeTitleColor;
     border-radius: 32px;
+}
+
+.dark .days-item:not(:first-child) .day::after {
+    background-color: $darkThemePrimaTextColor;
 }
 
