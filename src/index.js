@@ -120,7 +120,6 @@ const appointMainBtnCurrent = () => {
 
 const makeNearestCities = async (lat, lon, APIkey) => {
   const res = await getNearestCities(lat, lon, APIkey);
-  console.log(res);
   return makeCities(res);
 };
 
@@ -437,8 +436,12 @@ const appointCurrentBtn = (evt, prevEl, currentEl) => {
 
 const isNumeric = n => n.split('').some(el => Number(el));
 
-const setMapTitleVal = el => {
-  refs.mapTitle.textContent = el.textContent.split(',').slice(0, 1).join('');
+const setMapTitleVal = async el => {
+  const place = await translateTxt(
+    el.textContent.split(',').slice(0, 1).join('')
+  );
+
+  refs.mapTitle.textContent = place;
 };
 
 const getHumidity = res => {
