@@ -11,6 +11,7 @@ import getWeather from './modules/fetchWeather';
 import makeIconWeather from './modules/makeIconWeather';
 import getNearestCities from './modules/fetchNearestCities';
 import descriptionWeather from './modules/descriptionWeather';
+import translate from './modules/translate';
 
 // References
 
@@ -78,13 +79,7 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
 }).addTo(map);
 
-// Makers
-
-const fetchPromises = (lat, lon) => {
-  map.setView([lat, lon], 13);
-  getWeather(lat, lon).then(makeDays);
-  getNearestCities(lat, lon, APIkey).then(makeCities);
-};
+// Get Foo
 
 const getDataOnSubmit = place => {
   clearInput();
@@ -96,9 +91,47 @@ const getDataOnSubmit = place => {
   fetchPromises(...Object.values(place.dataset));
 };
 
+const fetchPromises = (lat, lon) => {
+  map.setView([lat, lon], 13);
+  makeWeatherDays(lat, lon);
+  makeNearestCities(lat, lon, APIkey);
+};
+
+// Makers
+
+const addActiveClass = num => {
+  refs.backdrop.classList.add('active');
+  refs.backdrop.children[num].classList.add('active');
+};
+
+const appointThemeBtnCurrentMarker = val => {
+  document.querySelector('.current-theme').classList.remove('current-theme');
+  document
+    .querySelector(`.theme-btn[name="btn-${val}"]`)
+    .classList.add('current-theme');
+};
+
+const appointMainBtnCurrent = () => {
+  if (document.querySelector('.current-btn')) {
+    document.querySelector('.current-btn').classList.remove('current-btn');
+    document.querySelector('.side-btn').classList.add('current-btn');
+  }
+};
+
+const makeNearestCities = async (lat, lon, APIkey) => {
+  const res = await getNearestCities(lat, lon, APIkey);
+  console.log(res);
+  return makeCities(res);
+};
+
+const makeWeatherDays = async (lat, lon) => {
+  const res = await getWeather(lat, lon);
+  return makeDays(res);
+};
+
 const makeCitiesByInpuValue = async input => {
   try {
-    const response = await getLocality(input, APIkey);
+    const response = await getLocality(input, 'ua', 3);
     if (!response.data.length)
       return Notiflix.Notify.warning(
         'На ваш запит немає відповідного результату. Будь ласка, спробуйте ще раз'
@@ -112,6 +145,7 @@ const makeCitiesByInpuValue = async input => {
 const makeCities = res => {
   res.data.list.forEach(async (el, i) => {
     const res = await getWeather(...Object.values(el.coord));
+    el.name = await translateTxt(el.name);
     makeItemCity(
       res.data.latitude,
       res.data.longitude,
@@ -140,7 +174,26 @@ const makeDays = res => {
   renderStatistic(res);
 };
 
+const setTheme = val => {
+  setThemeOnBody(val);
+
+  const settings = {
+    theme: val,
+  };
+
+  localStorage.setItem('settings', JSON.stringify(settings));
+};
+
 // Checks
+
+const checkHasSavedTheme = () => {
+  if (!localStorage.getItem('settings')) return;
+  else {
+    const { theme } = JSON.parse(localStorage.getItem('settings'));
+    setThemeOnBody(theme);
+    appointThemeBtnCurrentMarker(theme);
+  }
+};
 
 const checkGeolocation = () => {
   if (navigator.permissions) {
@@ -154,18 +207,20 @@ const checkGeolocation = () => {
             options
           );
         } else if (result.state === 'prompt') {
-          // Пользователь должен разрешить доступ к геопозиции
+          // Ще не підтвердили
         } else {
           Notiflix.Notify.warning('Доступ до геоданих заборонений');
         }
+        refs.mapTitle.innerHTML = 'Київ';
+        fetchPromises(50.45, 30.53);
       });
   } else {
     Notiflix.Notify.warning(
       'На жаль браузер не підтримує відстеження геоданих'
     );
+    refs.mapTitle.innerHTML = 'Київ';
+    fetchPromises(50.45, 30.53);
   }
-  refs.mapTitle.innerHTML = 'Київ';
-  fetchPromises(50.45, 30.53);
 };
 
 /**
@@ -208,12 +263,8 @@ const inputCityHandler = async evt => {
   const val = evt.target.value.toLowerCase().trim();
   if (!val) return (refs.searchList.innerHTML = '');
 
-  try {
-    const locality = await makeCitiesByInpuValue(val);
-    refs.searchList.innerHTML = await locality.map(renderSearch).join('');
-  } catch (error) {
-    console.log(error);
-  }
+  const locality = await makeCitiesByInpuValue(val);
+  refs.searchList.innerHTML = locality.map(renderSearch).join('');
 };
 
 const onSubmitFormHandler = evt => {
@@ -234,10 +285,12 @@ const onClickBtnSwichThemeHandler = evt => {
   appointCurrentBtn(evt, 'current-theme', 'theme-btn');
   removeTheme();
   if (evt.target.closest('.theme-btn').name === 'btn-white') return;
-  if (evt.target.closest('.theme-btn').name === 'btn-dark')
-    document.body.classList.add('dark');
-  if (evt.target.closest('.theme-btn').name === 'btn-paleblue')
-    document.body.classList.add('paleblue');
+  if (evt.target.closest('.theme-btn').name === 'btn-dark') {
+    setTheme('dark');
+  }
+  if (evt.target.closest('.theme-btn').name === 'btn-paleblue') {
+    setTheme('paleblue');
+  }
 };
 
 /**
@@ -338,26 +391,25 @@ const renderStatistic = res => {
 
 // Utils
 
+const translateTxt = async txt => {
+  const baseTxt = txt;
+  try {
+    const res = await translate('en', 'uk', txt);
+    return res.data[0][0][0];
+  } catch (error) {
+    return baseTxt;
+  }
+};
+
+const setThemeOnBody = theme => {
+  document.body.classList.add(theme);
+};
+
 const getCurrentTime = () => {
   return `${date.getHours().toString(10).padStart(2, '0')}:${date
     .getMinutes()
     .toString(10)
     .padStart(2, '0')}`;
-};
-
-const getHumidity = res => {
-  return Math.round(
-    res.data.hourly.relativehumidity_2m
-      .splice(0, 23)
-      .reduce((acc, el) => acc + el, 0) / 24
-  );
-};
-
-const removeActiveClass = () => {
-  const activeClassEls = document.querySelectorAll('.active');
-  if (activeClassEls.length) {
-    activeClassEls.forEach(el => el.classList.remove('active'));
-  }
 };
 
 const animatedStatsMark = (value, i) => {
@@ -374,6 +426,31 @@ const optimiseLocalityName = localityName => {
     .join(',');
 };
 
+const appointCurrentBtn = (evt, prevEl, currentEl) => {
+  if (document.querySelector(`.${prevEl}`)) {
+    document.querySelector(`.${prevEl}`).classList.remove(prevEl);
+    evt.target.closest(`.${currentEl}`).classList.add(prevEl);
+  }
+};
+
+// Calc Foo
+
+const isNumeric = n => n.split('').some(el => Number(el));
+
+const setMapTitleVal = el => {
+  refs.mapTitle.textContent = el.textContent.split(',').slice(0, 1).join('');
+};
+
+const getHumidity = res => {
+  return Math.round(
+    res.data.hourly.relativehumidity_2m
+      .splice(0, 23)
+      .reduce((acc, el) => acc + el, 0) / 24
+  );
+};
+
+// Cleaners
+
 const clearInput = () => {
   document.getElementsByName('search')[0].value = '';
 };
@@ -387,33 +464,20 @@ const clearCitiesList = () => {
 };
 
 const removeTheme = () => {
+  removeThemeInStorage();
   document.body.classList.remove('dark');
   document.body.classList.remove('paleblue');
 };
 
-const setMapTitleVal = el => {
-  refs.mapTitle.textContent = el.textContent.split(',').slice(0, 1).join('');
-};
-
-const isNumeric = n => n.split('').some(el => Number(el));
-
-const appointMainBtnCurrent = () => {
-  if (document.querySelector('.current-btn')) {
-    document.querySelector('.current-btn').classList.remove('current-btn');
-    document.querySelector('.side-btn').classList.add('current-btn');
+const removeActiveClass = () => {
+  const activeClassEls = document.querySelectorAll('.active');
+  if (activeClassEls.length) {
+    activeClassEls.forEach(el => el.classList.remove('active'));
   }
 };
 
-const addActiveClass = num => {
-  refs.backdrop.classList.add('active');
-  refs.backdrop.children[num].classList.add('active');
-};
-
-const appointCurrentBtn = (evt, prevEl, currentEl) => {
-  if (document.querySelector(`.${prevEl}`)) {
-    document.querySelector(`.${prevEl}`).classList.remove(prevEl);
-    evt.target.closest(`.${currentEl}`).classList.add(prevEl);
-  }
+const removeThemeInStorage = () => {
+  localStorage.removeItem('settings');
 };
 
 // Geo Foo
@@ -426,22 +490,26 @@ const success = async position => {
     Object.keys(document.querySelector('.current-btn').dataset).includes(
       'location'
     )
-  )
+  ) {
     switchColor(5000);
+  }
   clearCitiesList();
   const pos = [position.coords.latitude, position.coords.longitude];
   const res = await getNearestCities(...pos, APIkey);
-  refs.mapTitle.textContent = res.data.list[0].name;
+  refs.mapTitle.textContent = await translateTxt(res.data.list[0].name);
   fetchPromises(...pos);
 };
 
 const error = error => {
+  refs.mapTitle.innerHTML = 'Київ';
+  fetchPromises(50.45, 30.53);
   Notiflix.Notify.info('Не вдалось отримати геодані');
   console.log(error);
 };
 
-// Base Locality
+// Start Page
 
+checkHasSavedTheme();
 checkGeolocation();
 
 // Listeners

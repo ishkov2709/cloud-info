@@ -25,7 +25,7 @@
 .input-search,
 .search-item {
     width: 734px;
-    padding: 28px 56px 28px 24px;
+    padding: 28px 60px 28px 24px;
     font-size: 24px;
     background-color: $whiteThemeInputColor;
     color: $whiteThemeIconAccentColor;
@@ -40,11 +40,16 @@
     color: $whiteThemeTitleColor;
 }
 
-.icon-input {
+.subform-btn {
     position: absolute;
     top: 50%;
     right: 30px;
     transform: translateY(-50%);
+    border: none;
+    background: transparent;
+}
+
+.icon-input {
     fill: $whiteThemeIconAccentColor;
 }
 

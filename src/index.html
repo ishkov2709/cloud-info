@@ -25,6 +25,28 @@
         z-index: 1001;
       }
 
+      .dark .preloader {
+        background-image: linear-gradient(
+          to right top,
+          #212121,
+          #2d2d2d,
+          #3a3a3a,
+          #474747,
+          #555555
+        );
+      }
+
+      .paleblue .preloader {
+        background-image: linear-gradient(
+          to right top,
+          #b4cbed,
+          #99b3da,
+          #7f9bc8,
+          #6584b5,
+          #4a6ea3
+        );
+      }
+
       .spinner {
         animation: rotate 2s linear infinite;
         z-index: 2;
@@ -40,6 +62,11 @@
         stroke: #414141;
         stroke-linecap: round;
         animation: dash 1.5s ease-in-out infinite;
+      }
+
+      .dark .spinner .path,
+      .paleblue .spinner .path {
+        stroke: #fafafa;
       }
 
       @keyframes rotate {
@@ -207,9 +234,11 @@
               <form class="modal-form js-form">
                 <label class="search-formfied">
                   <input class="input-search" type="text" name="search" />
-                  <svg class="icon-input" width="24" height="24">
-                    <use href="./img/icons.svg#search"></use>
-                  </svg>
+                  <button class="subform-btn" type="submit" name="btn-subForm">
+                    <svg class="icon-input" width="24" height="24">
+                      <use href="./img/icons.svg#search"></use>
+                    </svg>
+                  </button>
                 </label>
               </form>
               <ul class="search-list js-search-list"></ul>
