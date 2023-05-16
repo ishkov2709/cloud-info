@@ -42,7 +42,7 @@ nav {
 
 .side-btn:hover,
 .side-btn:focus,
-.current-btn {
+.side-btn.current-btn {
     background-color: $whiteThemeBtnAccentColor;
     color: $whiteThemeIconAccentColor;
 }
@@ -51,12 +51,7 @@ nav {
     fill: currentColor;
 }
 
-
-.bot-side-item:first-child {
-    margin-bottom: 10px;
-}
-
-.bot-side-item:first-child .side-btn {
+.bot.side-btn {
     width: 40px;
     height: 40px;
     margin: 0 auto;
@@ -70,16 +65,6 @@ nav {
     animation-iteration-count: infinite;
 }
 
-@keyframes swichColor {
-    0% {
-        color: $whiteThemeIconAccentColor;
-    }
-
-    50% {
-        color: $accentSecColor;
-    }
-
-    100% {
-        color: $whiteThemeIconAccentColor;
-    }
+.current-btn.reject {
+    color: $rejectColor;
 }

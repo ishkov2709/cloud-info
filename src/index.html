@@ -149,26 +149,11 @@
               </li>
             </ul>
           </nav>
-          <ul class="bot-side-list">
-            <li class="bot-side-item">
-              <button class="side-btn" type="button">
-                <svg class="icon-side" width="16" height="18">
-                  <use href="./img/icons.svg#bell"></use>
-                </svg>
-              </button>
-            </li>
-            <li class="bot-side-item">
-              <button class="side-btn" type="button">
-                <img
-                  class="icon-side"
-                  src="./img/sidebar/user.png"
-                  alt="User"
-                  width="60"
-                  height="60"
-                />
-              </button>
-            </li>
-          </ul>
+          <button class="bot side-btn" type="button">
+            <svg class="icon-side" width="16" height="18">
+              <use href="./img/icons.svg#bell"></use>
+            </svg>
+          </button>
         </aside>
         <main>
           <section class="section-days">
@@ -188,13 +173,18 @@
                 </li>
               </ul>
             </div>
-            <ul class="days-list js-days-list">
-              <li class="days-item"></li>
-              <li class="days-item"></li>
-              <li class="days-item"></li>
-              <li class="days-item"></li>
-              <li class="days-item"></li>
-            </ul>
+            <div class="days-content-wrapper">
+              <ul class="days-list js-days-list">
+                <li class="days-item"></li>
+                <li class="days-item"></li>
+                <li class="days-item"></li>
+                <li class="days-item"></li>
+                <li class="days-item"></li>
+              </ul>
+              <div class="chart-container js-chart">
+                <canvas id="myChart"></canvas>
+              </div>
+            </div>
           </section>
           <section class="section-stats">
             <h2 class="stats-title title">Статистика</h2>
@@ -228,6 +218,16 @@
               </button>
             </div>
             <ul class="cities-list js-cities-list"></ul>
+            <div class="more-wrapper js-more-wrapper">
+              <button class="close-more-btn" type="button" name="close-btn">
+                <svg class="icon-close" width="36" height="36">
+                  <use href="./img/icons.svg#arrow"></use>
+                </svg>
+              </button>
+              <div class="cities-list-wrapper">
+                <ul class="more-cities-list"></ul>
+              </div>
+            </div>
           </section>
           <div class="backdrop js-backdrop">
             <div class="modal-search" data-modal="search">
@@ -244,10 +244,17 @@
               <ul class="search-list js-search-list"></ul>
             </div>
             <div class="modal-settings" data-modal="settings">
-              <ul class="geo-lang-list">
-                <li><h2 class="set-title title">Country</h2></li>
-                <li><h2 class="set-title title">Language</h2></li>
-                <li><h2 class="set-title title">Backyard</h2></li>
+              <ul class="geo-lang-list js-geolang-list">
+                <li class="geo-lang-item">
+                  <h2 class="set-title title">Країна</h2>
+                </li>
+                <li class="geo-lang-item">
+                  <h2 class="set-title title">Мова</h2>
+                  <h3 class="set-title title">Українська</h3>
+                </li>
+                <li class="geo-lang-item">
+                  <h2 class="set-title title">Місто</h2>
+                </li>
               </ul>
               <ul class="theme-list js-themes">
                 <li class="theme-item">

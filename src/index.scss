@@ -1,9 +1,10 @@
 @import '~normalize.css';
 @import './style/base/reset';
-@import './style/base/vars';
 @import './style/base/fonts';
+@import './style/utils/vars';
 @import './style/utils/placeholders';
 @import './style/utils/mixins';
+@import './style/utils/keyframes';
 @import './style/components/body';
 @import './style/components/container';
 @import './style/components/sections';

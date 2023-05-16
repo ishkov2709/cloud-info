@@ -34,8 +34,15 @@
     margin-bottom: 120px;
 }
 
+.geo-lang-item {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+}
+
 .set-title {
-    padding: 0 24px;
+    padding: 2px 24px;
 }
 
 .dark .set-title {

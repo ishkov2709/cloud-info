@@ -33,6 +33,10 @@
     padding: 14px 24px;
     background-color: $whiteThemeBgColor;
     border-radius: 20px;
+    animation-name: opacity;
+    animation-duration: 500ms;
+    animation-timing-function: $timeCubic;
+    animation-iteration-count: 1;
 }
 
 .dark .cities-item {
@@ -80,4 +84,83 @@
     left: 0px;
 }
 
+.more-wrapper {
+    position: absolute;
+    top: 0;
+    right: -413px;
+    width: 413px;
+    height: 100%;
+    padding: 10px 5px 10px 0;
+    background-color: $whiteThemeSecBgColor;
+    border-radius: 10px;  
+    transition: right 250ms $timeCubic;
+}
 
+.more-wrapper.active {
+    right: 0;
+}
+
+.dark .more-wrapper {
+    background-color: $darkThemeBackdropBgColor;
+
+}
+
+.paleblue .more-wrapper {
+    background-color: $paleblueThemeBackdropBgColor;
+}
+
+.close-more-btn {
+    position: absolute;
+    top: 50%;
+    left: -25px;
+    transform: translateY(-50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+    border: none;
+    visibility: hidden;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.more-wrapper.active .close-more-btn {
+    visibility: visible;
+    pointer-events: all;
+}
+
+.cities-list-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
+
+.cities-list-wrapper .cities-item {
+    margin: 0 auto 10px auto;
+    width: 350px;
+}
+
+.cities-list-wrapper .scrollbar-track {
+    background: transparent;
+}
+
+.cities-list-wrapper .scrollbar-thumb {
+    background: $whiteThemeTitleColor;
+}
+
+.dark .cities-list-wrapper .scrollbar-track {
+    background: transparent;
+}
+
+.dark .cities-list-wrapper .scrollbar-thumb {
+    background: $whiteThemeIconAccentColor;
+}
+
+.paleblue .cities-list-wrapper .scrollbar-track {
+    background: transparent;
+}
+
+.paleblue .cities-list-wrapper .scrollbar-thumb {
+    background: $whiteThemeTitleColor;
+}

@@ -1,3 +1,5 @@
+
+
 .selecter-box {
     display: flex;
     align-items: center;
@@ -41,9 +43,26 @@
     color: $darkThemeTitleColor;
 }
 
+.days-content-wrapper {
+    position: relative;
+}
+
 .days-list {
     display: flex;
     gap: 20px;
+    opacity: 1;
+}
+
+.days-list.hidden {
+    opacity: 0;
+}
+
+.days-item {
+    min-height: 295px;
+    animation-name: opacity;
+    animation-duration: 500ms;
+    animation-timing-function: $timeCubic;
+    animation-iteration-count: 1;
 }
 
 .days-item:first-child {
@@ -186,5 +205,23 @@
 
 .dark .days-item:not(:first-child) .day::after {
     background-color: $darkThemePrimaTextColor;
+}
+
+.chart-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.hidden + .chart-container {
+    visibility: visible;
+    pointer-events: all;
+    transition-delay: 200ms;
 }
 

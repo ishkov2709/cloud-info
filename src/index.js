@@ -3,15 +3,27 @@ import './index.scss';
 import leaflet from '../node_modules/leaflet/dist/leaflet.js';
 import _ from 'lodash';
 import Notiflix from 'notiflix';
+import translate from './modules/translate';
+import Scrollbar from 'smooth-scrollbar';
+import Chart from 'chart.js/auto';
 import dashedline from './modules/dashedline';
 import switchColor from './modules/swithColor';
 import '../node_modules/leaflet/dist/leaflet.css';
 import getLocality from './modules/fetchLocality';
 import getWeather from './modules/fetchWeather';
+import getForSaveLocality from './modules/fetchForSaveLocality';
 import makeIconWeather from './modules/makeIconWeather';
 import getNearestCities from './modules/fetchNearestCities';
+import getDetailCurrentWeather from './modules/detailCurrentWeather';
 import descriptionWeather from './modules/descriptionWeather';
-import translate from './modules/translate';
+
+// classes
+
+class CurrentBtn {
+  constructor(btnSelector) {
+    this.btn = document.querySelector(`.${btnSelector}`);
+  }
+}
 
 // References
 
@@ -27,6 +39,10 @@ const refs = {
   citiesList: document.querySelector('.js-cities-list'),
   statsList: document.querySelector('.js-stats-list'),
   themes: document.querySelector('.js-themes'),
+  geoLang: document.querySelector('.js-geolang-list'),
+  chart: document.querySelector('.js-chart'),
+  moreCities: document.querySelector('.js-more-wrapper'),
+  showAllBtn: document.querySelector('.btn-show-all'),
 };
 
 // Constants
@@ -44,7 +60,7 @@ const daysOfWeek = [
   'Субота',
 ];
 
-const options = {
+const optionsGeo = {
   enableHighAccuracy: true,
   maximumAge: 30000,
   timeout: 15000,
@@ -65,6 +81,10 @@ sortDays(daysOfWeek);
 
 [...refs.humidityList.children].forEach(el => el.append(dashedline(18)));
 
+// Scrollbar
+
+Scrollbar.init(document.querySelector('.cities-list-wrapper'));
+
 /**
   |============================
   | GLOBAL MAP
@@ -79,25 +99,141 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
 }).addTo(map);
 
+// Chart
+
+const ctx = document.getElementById('myChart').getContext('2d');
+let myChart;
+
 // Get Foo
 
-const getDataOnSubmit = place => {
+const getDataOnSubmit = async place => {
   clearInput();
   clearCitiesList();
+  clearMoreCitiesList();
   removeActiveClass();
   clearSearchList();
-  setMapTitleVal(place);
+  await setMapTitleVal(place);
   appointMainBtnCurrent();
+  removeSaveLocalitySetting();
+  await setSaveLocality(
+    ...Object.values(place.dataset),
+    refs.mapTitle.textContent
+  );
+  getSaveLocalityForSettings();
   fetchPromises(...Object.values(place.dataset));
+  refs.daysList.addEventListener('click', onClickBtnOpenChartHandler);
 };
 
-const fetchPromises = (lat, lon) => {
-  map.setView([lat, lon], 13);
-  makeWeatherDays(lat, lon);
-  makeNearestCities(lat, lon, APIkey);
+const fetchPromises = (lat, lng) => {
+  map.setView([lat, lng], 13);
+  makeWeatherDays(lat, lng);
+  makeNearestCities(lat, lng, APIkey);
+  makeAllNearestCities(lat, lng, APIkey);
+};
+
+const getSaveLocalityForSettings = () => {
+  const saveLocality = localStorage.getItem('locality');
+  if (saveLocality) {
+    const locality = JSON.parse(saveLocality);
+    refs.geoLang.firstElementChild.insertAdjacentHTML(
+      'beforeend',
+      renderGeoLang(locality.country)
+    );
+    refs.geoLang.lastElementChild.insertAdjacentHTML(
+      'beforeend',
+      renderGeoLang(locality.city)
+    );
+  } else {
+    refs.geoLang.firstElementChild.insertAdjacentHTML(
+      'beforeend',
+      renderGeoLang('Україна')
+    );
+    refs.geoLang.lastElementChild.insertAdjacentHTML(
+      'beforeend',
+      renderGeoLang('Київ')
+    );
+  }
+};
+
+const getSaveLocalityForBaseFetch = () => {
+  const saveLocality = localStorage.getItem('locality');
+  if (saveLocality) {
+    const locality = JSON.parse(saveLocality);
+    refs.mapTitle.innerHTML = locality.city;
+    fetchPromises(locality.lat, locality.lon);
+  } else {
+    refs.mapTitle.innerHTML = 'Київ';
+    fetchPromises(50.45, 30.53);
+  }
+  refs.daysList.addEventListener('click', onClickBtnOpenChartHandler);
+};
+
+const getWeatherChart = async ({ city, lat, lon }) => {
+  const res = await getDetailCurrentWeather(lat, lon);
+
+  Chart.defaults.backgroundColor = makeChartColor();
+  Chart.defaults.color = makeChartColor();
+
+  myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: res.data.hourly.time.map(parseDayTimeChart),
+      datasets: [
+        {
+          label: `${city}. Погодинна температура`,
+          data: res.data.hourly.temperature_2m,
+          backgroundColor: makeChartColor(),
+          borderColor: makeChartColor(),
+          borderWidth: 2,
+          pointRadius: 1,
+        },
+      ],
+    },
+  });
+
+  refs.chart.addEventListener('click', onClickCloseChartHandler);
 };
 
 // Makers
+
+const makeCityWeather = async target => {
+  if (target.closest('.btn-see')) {
+    const placeInfo = target.closest('.cities-item').dataset;
+    refs.mapTitle.textContent = placeInfo.city;
+    clearCitiesList();
+    clearMoreCitiesList();
+    onClickCloseChartHandler();
+    removeSaveLocalitySetting();
+    await setSaveLocality(placeInfo.lat, placeInfo.lon, placeInfo.city);
+    getSaveLocalityForSettings();
+    fetchPromises(placeInfo.lat, placeInfo.lon);
+  }
+};
+
+const makeChartColor = () => {
+  const body = document.body;
+  if (body.classList.contains('dark')) {
+    return '#FFFFFF';
+  } else {
+    return '#000000';
+  }
+};
+
+const setSaveLocality = async (lat, lon, place) => {
+  try {
+    const res = await getForSaveLocality(lat, lon, 'uk');
+    const locality = {
+      city: res.data.address.city,
+      country: res.data.address.country,
+      lat,
+      lon,
+    };
+    if (!res.data.address.city && place) locality.city = place;
+    localStorage.setItem('locality', JSON.stringify(locality));
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 const addActiveClass = num => {
   refs.backdrop.classList.add('active');
@@ -105,16 +241,18 @@ const addActiveClass = num => {
 };
 
 const appointThemeBtnCurrentMarker = val => {
-  document.querySelector('.current-theme').classList.remove('current-theme');
-  document
-    .querySelector(`.theme-btn[name="btn-${val}"]`)
-    .classList.add('current-theme');
+  const prevCurrentTheme = new CurrentBtn('current-theme');
+  prevCurrentTheme.btn.classList.remove('current-theme');
+  const presentCurrentTheme = new CurrentBtn(`theme-btn[name="btn-${val}`);
+  presentCurrentTheme.btn.classList.add('current-theme');
 };
 
 const appointMainBtnCurrent = () => {
-  if (document.querySelector('.current-btn')) {
-    document.querySelector('.current-btn').classList.remove('current-btn');
-    document.querySelector('.side-btn').classList.add('current-btn');
+  const prevCurrent = new CurrentBtn('current-btn');
+  if (prevCurrent.btn) {
+    prevCurrent.btn.classList.remove('current-btn');
+    const presentCurrent = new CurrentBtn('side-btn');
+    presentCurrent.btn.classList.add('current-btn');
   }
 };
 
@@ -142,7 +280,7 @@ const makeCitiesByInpuValue = async input => {
 };
 
 const makeCities = res => {
-  res.data.list.forEach(async (el, i) => {
+  res.data.list.forEach(async el => {
     const res = await getWeather(...Object.values(el.coord));
     el.name = await translateTxt(el.name);
     makeItemCity(
@@ -152,6 +290,10 @@ const makeCities = res => {
       res.data.current_weather.weathercode,
       res.data.current_weather.temperature
     );
+    refs.citiesList.addEventListener(
+      'click',
+      onClickBtnSeeFetchCityWeatherHandler
+    );
   });
 };
 
@@ -159,9 +301,50 @@ const makeItemCity = (lat, lon, city, weathercode, temp) => {
   if (
     refs.citiesList.childElementCount > 2 ||
     city === refs.mapTitle.textContent
-  )
+  ) {
     return;
+  } else if (
+    refs.citiesList.lastElementChild !== null &&
+    [...refs.citiesList.children].some(el => el.dataset.city === city)
+  ) {
+    return;
+  }
   return refs.citiesList.insertAdjacentHTML(
+    'beforeend',
+    renderItemCity(lat, lon, city, weathercode, temp)
+  );
+};
+
+const makeAllNearestCities = async (lat, lon, APIkey) => {
+  const res = await getNearestCities(lat, lon, APIkey);
+  return makeAllCities(res);
+};
+
+const makeAllCities = res => {
+  res.data.list.forEach(async el => {
+    const res = await getWeather(...Object.values(el.coord));
+    el.name = await translateTxt(el.name);
+    makeItemAllCities(
+      res.data.latitude,
+      res.data.longitude,
+      el.name,
+      res.data.current_weather.weathercode,
+      res.data.current_weather.temperature
+    );
+  });
+};
+
+const makeItemAllCities = (lat, lon, city, weathercode, temp) => {
+  const moreCitiesList = refs.moreCities.lastElementChild.firstElementChild;
+  if (city === refs.mapTitle.textContent) {
+    return;
+  } else if (
+    moreCitiesList.lastElementChild !== null &&
+    [...moreCitiesList.children].some(el => el.dataset.city === city)
+  ) {
+    return;
+  }
+  return moreCitiesList.insertAdjacentHTML(
     'beforeend',
     renderItemCity(lat, lon, city, weathercode, temp)
   );
@@ -203,22 +386,23 @@ const checkGeolocation = () => {
           return navigator.geolocation.getCurrentPosition(
             success,
             error,
-            options
+            optionsGeo
           );
         } else if (result.state === 'prompt') {
           // Ще не підтвердили
         } else {
           Notiflix.Notify.warning('Доступ до геоданих заборонений');
         }
-        refs.mapTitle.innerHTML = 'Київ';
-        fetchPromises(50.45, 30.53);
+        getSaveLocalityForSettings();
+        getSaveLocalityForBaseFetch();
+        addRejectLight();
       });
   } else {
     Notiflix.Notify.warning(
       'На жаль браузер не підтримує відстеження геоданих'
     );
-    refs.mapTitle.innerHTML = 'Київ';
-    fetchPromises(50.45, 30.53);
+    getSaveLocalityForBaseFetch();
+    addRejectLight();
   }
 };
 
@@ -230,32 +414,27 @@ const checkGeolocation = () => {
 
 const onClickBtnSidebarHandler = evt => {
   if (!evt.target.closest('.side-btn')) return;
-  const target = Object.keys(evt.target.closest('.side-btn').dataset);
-  if (
-    target.join('') ===
-    Object.keys(document.querySelector('.current-btn').dataset).join('')
-  )
+  const targetBtnData = Object.keys(evt.target.closest('.side-btn').dataset);
+  const current = new CurrentBtn('current-btn');
+  if (targetBtnData.join('') === Object.keys(current.btn.dataset).join(''))
     return;
+  removeAllListeners();
   removeActiveClass();
   appointCurrentBtn(evt, 'current-btn', 'side-btn');
-  if (target.includes('search')) {
+  if (targetBtnData.includes('search')) {
     addActiveClass(0);
     refs.searchList.addEventListener(
       'click',
       onClickItemCityFetchWeatherDataHandler
     );
     refs.modalform.addEventListener('submit', onSubmitFormHandler);
-  } else if (target.includes('location')) {
-    navigator.geolocation.getCurrentPosition(success, error, options);
-  } else if (target.includes('settings')) {
+  } else if (targetBtnData.includes('location')) {
+    navigator.geolocation.getCurrentPosition(success, error, optionsGeo);
+  } else if (targetBtnData.includes('settings')) {
     addActiveClass(1);
     refs.themes.addEventListener('click', onClickBtnSwichThemeHandler);
-  } else {
-    refs.searchList.removeEventListener(
-      'click',
-      onClickItemCityFetchWeatherDataHandler
-    );
   }
+  refs.showAllBtn.addEventListener('click', onClickShowAllCitiesHandler);
 };
 
 const inputCityHandler = async evt => {
@@ -280,15 +459,55 @@ const onClickItemCityFetchWeatherDataHandler = evt => {
 };
 
 const onClickBtnSwichThemeHandler = evt => {
-  if (!evt.target.closest('.theme-btn')) return;
+  const themeBtn = evt.target.closest('.theme-btn');
+  if (!themeBtn) return;
   appointCurrentBtn(evt, 'current-theme', 'theme-btn');
   removeTheme();
-  if (evt.target.closest('.theme-btn').name === 'btn-white') return;
-  if (evt.target.closest('.theme-btn').name === 'btn-dark') {
+  if (themeBtn.name === 'btn-white') return;
+  if (themeBtn.name === 'btn-dark') {
     setTheme('dark');
   }
-  if (evt.target.closest('.theme-btn').name === 'btn-paleblue') {
+  if (themeBtn.name === 'btn-paleblue') {
     setTheme('paleblue');
+  }
+};
+
+const onClickBtnSeeFetchCityWeatherHandler = async ({ target }) => {
+  makeCityWeather(target);
+};
+
+const onClickBtnOpenChartHandler = evt => {
+  if (evt.target.name === 'detail') {
+    evt.currentTarget.classList.add('hidden');
+    getWeatherChart(JSON.parse(localStorage.getItem('locality')));
+    return;
+  }
+};
+
+const onClickCloseChartHandler = () => {
+  refs.daysList.classList.remove('hidden');
+  refs.chart.removeEventListener('click', onClickCloseChartHandler);
+  if (myChart) myChart.destroy();
+};
+
+const onClickShowAllCitiesHandler = () => {
+  refs.moreCities.classList.add('active');
+  refs.showAllBtn.removeEventListener('click', onClickShowAllCitiesHandler);
+  refs.moreCities.addEventListener('click', onClickMoreCitiesWrapperHandler);
+};
+
+const onClickMoreCitiesWrapperHandler = ({ target }) => {
+  if (target.closest('.close-more-btn')) {
+    refs.moreCities.classList.remove('active');
+    refs.moreCities.removeEventListener(
+      'click',
+      onClickMoreCitiesWrapperHandler
+    );
+    refs.showAllBtn.addEventListener('click', onClickShowAllCitiesHandler);
+  }
+
+  if (target.closest('.btn-see')) {
+    makeCityWeather(target);
   }
 };
 
@@ -299,6 +518,8 @@ const onClickBtnSwichThemeHandler = evt => {
 */
 
 const renderCurrentDay = res => {
+  const { temperature, weathercode, windspeed, winddirection } =
+    res.data.current_weather;
   refs.daysList.firstElementChild.innerHTML = `
            <div class="day-time-wrapper">
                 <h2 class="day">${daysOfWeek[0]}</h2>
@@ -307,26 +528,22 @@ const renderCurrentDay = res => {
                 <div class="first-day-content">
                   <div class="temperature-wrapper">
                   <p class="temperature js-current-temp">${Math.round(
-                    res.data.current_weather.temperature
+                    temperature
                   )}</p>
                   <svg class="icon-weather" width="117" height="95">
                     <use href="./assets/icons.svg#${makeIconWeather(
-                      res.data.current_weather.weathercode
+                      weathercode
                     )}"></use>
                   </svg>
                 </div>
                 <ul class="weather-info-list">
                   <li class="weather-info-item">
                     Швидкість вітру
-                    <span class="weather-val">${
-                      res.data.current_weather.windspeed
-                    }</span>
+                    <span class="weather-val">${windspeed}</span>
                     <span class="unit">км&sol;ч</span>
                   </li>
                   <li class="weather-info-item">
-                    Напрям вітру <span class="weather-val">${
-                      res.data.current_weather.winddirection
-                    }</span>
+                    Напрям вітру <span class="weather-val">${winddirection}</span>
                     <span class="unit">&deg;</span>
                   </li>
                   <li class="weather-info-item">
@@ -336,14 +553,16 @@ const renderCurrentDay = res => {
                     <span class="unit">&percnt;</span>
                   </li>
                 </ul>
-                <button class="btn-more" type="button">Детальніше</button>
+                <button class="btn-more" type="button" name="detail">Детальніше</button>
             </div>`;
 };
 
 const renderDaysForecast = res => {
   [...refs.daysList.children].forEach((el, i) => {
     if (i > 0) {
-      el.innerHTML = `<h2 class="day">${daysOfWeek[i].slice(0, 3)}</h2>
+      el.innerHTML = `<h2 class="day">${abbreviatedDaysOfWeek(
+        daysOfWeek[i]
+      )}</h2>
           <svg class="icon-weather" width="64" height="64">
             <use href="./assets/icons.svg#${makeIconWeather(
               res.data.daily.weathercode[i]
@@ -357,7 +576,7 @@ const renderDaysForecast = res => {
 };
 
 const renderItemCity = (lat, lon, city, weathercode, temp) => {
-  return `<li class="cities-item" data-lat="${lat}" data-lon="${lon}">
+  return `<li class="cities-item" data-city="${city}" data-lat="${lat}" data-lon="${lon}">
       <div class="city-info-wrapper">
         <h3 class="city">${city}</h3>
         <p class="info">${descriptionWeather(weathercode)}</p>
@@ -382,13 +601,49 @@ const renderSearch = ({ lat, lon, display_name }) => {
 
 const renderStatistic = res => {
   [...refs.statsList.children].forEach((el, i) => {
-    el.innerHTML = `<p class="stats-day">${daysOfWeek[i].slice(0, 3)}</p>
+    el.innerHTML = `<p class="stats-day">${abbreviatedDaysOfWeek(
+      daysOfWeek[i]
+    )}</p>
           <span class="mark js-mark"></span>`;
     animatedStatsMark(res.data.daily.precipitation_probability_mean, i);
   });
 };
 
+const renderGeoLang = placeName => {
+  return `<h3 class="set-title title" data-place="${placeName}">${placeName}</h3>`;
+};
+
 // Utils
+
+const parseDayTimeChart = daytime => {
+  const date = new Date(daytime);
+
+  const options = {
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+  };
+
+  return date.toLocaleString('uk-UA', options);
+};
+
+const abbreviatedDaysOfWeek = val => {
+  if (val === 'Неділя') return 'Нд';
+  if (val === 'Понеділок') return 'Пн';
+  if (val === 'Вівторок') return 'Вт';
+  if (val === 'Середа') return 'Ср';
+  if (val === 'Четвер') return 'Чт';
+  if (val === "П'ятниця") return 'Пт';
+  if (val === 'Субота') return 'Сб';
+};
+
+const addRejectLight = () => {
+  const current = new CurrentBtn('current-btn');
+  const data = Object.keys(current.btn.dataset).join('');
+  if (data === 'location')
+    document.querySelector('.current-btn').classList.add('reject');
+};
 
 const translateTxt = async txt => {
   const baseTxt = txt;
@@ -483,6 +738,38 @@ const removeThemeInStorage = () => {
   localStorage.removeItem('settings');
 };
 
+const removeAllListeners = () => {
+  refs.searchList.removeEventListener(
+    'click',
+    onClickItemCityFetchWeatherDataHandler
+  );
+  refs.modalform.removeEventListener('submit', onSubmitFormHandler);
+  refs.themes.removeEventListener('click', onClickBtnSwichThemeHandler);
+  onClickCloseChartHandler();
+};
+
+const removeSaveLocalitySetting = () => {
+  [...refs.geoLang.firstElementChild.children].forEach(el => {
+    if (el.dataset.place) {
+      el.remove();
+    }
+  });
+  [...refs.geoLang.lastElementChild.children].forEach(el => {
+    if (el.dataset.place) {
+      el.remove();
+    }
+  });
+};
+
+const clearMoreCitiesList = () => {
+  const scrollContent = refs.moreCities.querySelector('.scroll-content');
+  [...scrollContent.children].forEach(removeElItem);
+};
+
+const removeElItem = el => {
+  if (el.tagName === 'LI') el.remove();
+};
+
 // Geo Foo
 
 const success = async position => {
@@ -497,16 +784,21 @@ const success = async position => {
     switchColor(5000);
   }
   clearCitiesList();
+  clearMoreCitiesList();
   const pos = [position.coords.latitude, position.coords.longitude];
   const res = await getNearestCities(...pos, APIkey);
   refs.mapTitle.textContent = await translateTxt(res.data.list[0].name);
   fetchPromises(...pos);
+  await setSaveLocality(...pos);
+  getSaveLocalityForSettings();
+  refs.daysList.addEventListener('click', onClickBtnOpenChartHandler);
 };
 
 const error = error => {
-  refs.mapTitle.innerHTML = 'Київ';
-  fetchPromises(50.45, 30.53);
-  Notiflix.Notify.info('Не вдалось отримати геодані');
+  addRejectLight();
+  getSaveLocalityForSettings();
+  getSaveLocalityForBaseFetch();
+  Notiflix.Notify.failure('Не вдалось отримати геодані');
   console.log(error);
 };
 
@@ -520,3 +812,5 @@ checkGeolocation();
 refs.sidebar.addEventListener('click', onClickBtnSidebarHandler);
 
 refs.modalform.addEventListener('input', _.debounce(inputCityHandler, 500));
+
+refs.showAllBtn.addEventListener('click', onClickShowAllCitiesHandler);
