@@ -157,23 +157,34 @@
         </aside>
         <main>
           <section class="section-days">
-            <div class="selecter-box">
+            <div class="selecter-box js-selecter-box">
               <h1 class="selecter-title title">Прогноз погоди</h1>
               <ul class="select-days-list">
                 <li class="select-days-item">
-                  <button class="btn-select" type="button">Today</button>
+                  <button class="btn-select" type="button" name="today">
+                    Today
+                  </button>
                 </li>
                 <li class="select-days-item">
-                  <button class="btn-select" type="button">Tomorrow</button>
+                  <button class="btn-select" type="button" name="tomorrow">
+                    Tomorrow
+                  </button>
                 </li>
                 <li class="select-days-item">
-                  <button class="btn-select current" type="button">
+                  <button
+                    class="btn-select current"
+                    type="button"
+                    name="nextfivedays"
+                  >
                     Next 5 days
                   </button>
                 </li>
               </ul>
             </div>
-            <div class="days-content-wrapper">
+            <div
+              class="days-content-wrapper current-content"
+              data-content="nextfivedays"
+            >
               <ul class="days-list js-days-list">
                 <li class="days-item"></li>
                 <li class="days-item"></li>
@@ -185,6 +196,8 @@
                 <canvas id="myChart"></canvas>
               </div>
             </div>
+            <div class="current-weather-box" data-content="today"></div>
+            <div class="tomorrow-weather-box" data-content="tomorrow"></div>
           </section>
           <section class="section-stats">
             <h2 class="stats-title title">Статистика</h2>

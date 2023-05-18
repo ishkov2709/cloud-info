@@ -1,7 +1,7 @@
 import './index.html';
 import './index.scss';
 import leaflet from '../node_modules/leaflet/dist/leaflet.js';
-import _ from 'lodash';
+import _, { get } from 'lodash';
 import Notiflix from 'notiflix';
 import translate from './modules/translate';
 import Scrollbar from 'smooth-scrollbar';
@@ -14,8 +14,10 @@ import getWeather from './modules/fetchWeather';
 import getForSaveLocality from './modules/fetchForSaveLocality';
 import makeIconWeather from './modules/makeIconWeather';
 import getNearestCities from './modules/fetchNearestCities';
-import getDetailCurrentWeather from './modules/detailCurrentWeather';
+import getDetailTemp from './modules/fetchDetailTemp';
 import descriptionWeather from './modules/descriptionWeather';
+import getDetailWeather from './modules/fetchDetailWeather';
+import getDetailWeatherTomorrow from './modules/fetchDetailWeatherTomorrow';
 
 // classes
 
@@ -36,6 +38,7 @@ const refs = {
   modalform: document.querySelector('.js-form'),
   searchList: document.querySelector('.js-search-list'),
   daysList: document.querySelector('.js-days-list'),
+  selecterBox: document.querySelector('.js-selecter-box'),
   citiesList: document.querySelector('.js-cities-list'),
   statsList: document.querySelector('.js-stats-list'),
   themes: document.querySelector('.js-themes'),
@@ -43,6 +46,9 @@ const refs = {
   chart: document.querySelector('.js-chart'),
   moreCities: document.querySelector('.js-more-wrapper'),
   showAllBtn: document.querySelector('.btn-show-all'),
+  today: document.querySelector('.current-weather-box'),
+  tomorrow: document.querySelector('.tomorrow-weather-box'),
+  contentDaysArr: [...document.querySelectorAll('[data-content]')],
 };
 
 // Constants
@@ -65,6 +71,11 @@ const optionsGeo = {
   maximumAge: 30000,
   timeout: 15000,
 };
+
+// Variables
+
+let todayCodeWeather;
+let tomorrowCodeWeather;
 
 // Calculating the day of the week
 
@@ -124,9 +135,11 @@ const getDataOnSubmit = async place => {
   refs.daysList.addEventListener('click', onClickBtnOpenChartHandler);
 };
 
-const fetchPromises = (lat, lng) => {
+const fetchPromises = async (lat, lng) => {
   map.setView([lat, lng], 13);
-  makeWeatherDays(lat, lng);
+  await makeWeatherDays(lat, lng);
+  makeDetailCurrentDayWeather(lat, lng);
+  makeDetailWeatherTomorrow(lat, lng);
   makeNearestCities(lat, lng, APIkey);
   makeAllNearestCities(lat, lng, APIkey);
 };
@@ -155,7 +168,7 @@ const getSaveLocalityForSettings = () => {
   }
 };
 
-const getSaveLocalityForBaseFetch = () => {
+const getSaveLocalityForBaseFetch = async () => {
   const saveLocality = localStorage.getItem('locality');
   if (saveLocality) {
     const locality = JSON.parse(saveLocality);
@@ -164,12 +177,13 @@ const getSaveLocalityForBaseFetch = () => {
   } else {
     refs.mapTitle.innerHTML = 'Київ';
     fetchPromises(50.45, 30.53);
+    await setSaveLocality(50.45, 30.53, 'Київ');
   }
   refs.daysList.addEventListener('click', onClickBtnOpenChartHandler);
 };
 
 const getWeatherChart = async ({ city, lat, lon }) => {
-  const res = await getDetailCurrentWeather(lat, lon);
+  const res = await getDetailTemp(lat, lon);
 
   Chart.defaults.backgroundColor = makeChartColor();
   Chart.defaults.color = makeChartColor();
@@ -195,6 +209,35 @@ const getWeatherChart = async ({ city, lat, lon }) => {
 };
 
 // Makers
+
+const activeContent = name => {
+  refs.contentDaysArr.forEach(el => changeClassOnNode(el, name));
+};
+
+const changeClassOnNode = (el, name) => {
+  el.dataset.content === name
+    ? el.classList.add('current-content')
+    : el.classList.remove('current-content');
+};
+
+const makeDetailCurrentDayWeather = async (lat, lon) => {
+  const res = await getDetailWeather(lat, lon, APIkey);
+  refs.today.innerHTML = renderDetailWeather(
+    res.data,
+    todayCodeWeather,
+    daysOfWeek[0]
+  );
+};
+
+const makeDetailWeatherTomorrow = async (lat, lon) => {
+  const res = await getDetailWeatherTomorrow(lat, lon, APIkey);
+  console.log(res.data.list[11]);
+  refs.tomorrow.innerHTML = renderDetailWeather(
+    res.data.list[1],
+    tomorrowCodeWeather,
+    daysOfWeek[1]
+  );
+};
 
 const makeCityWeather = async target => {
   if (target.closest('.btn-see')) {
@@ -511,6 +554,16 @@ const onClickMoreCitiesWrapperHandler = ({ target }) => {
   }
 };
 
+const onClickBtnSelectDaysHandler = ({ target }) => {
+  if (target.tagName !== 'BUTTON') return;
+  else {
+    const prevCurrent = new CurrentBtn('btn-select.current');
+    prevCurrent.btn.classList.remove('current');
+    target.classList.add('current');
+    activeContent(target.name);
+  }
+};
+
 /**
   |============================
   | Renders
@@ -520,6 +573,7 @@ const onClickMoreCitiesWrapperHandler = ({ target }) => {
 const renderCurrentDay = res => {
   const { temperature, weathercode, windspeed, winddirection } =
     res.data.current_weather;
+  todayCodeWeather = weathercode;
   refs.daysList.firstElementChild.innerHTML = `
            <div class="day-time-wrapper">
                 <h2 class="day">${daysOfWeek[0]}</h2>
@@ -540,7 +594,7 @@ const renderCurrentDay = res => {
                   <li class="weather-info-item">
                     Швидкість вітру
                     <span class="weather-val">${windspeed}</span>
-                    <span class="unit">км&sol;ч</span>
+                    <span class="unit">м&sol;с</span>
                   </li>
                   <li class="weather-info-item">
                     Напрям вітру <span class="weather-val">${winddirection}</span>
@@ -572,6 +626,7 @@ const renderDaysForecast = res => {
             res.data.daily.temperature_2m_max[i]
           )}</p>`;
     }
+    if (i === 1) tomorrowCodeWeather = res.data.daily.weathercode[i];
   });
 };
 
@@ -613,7 +668,89 @@ const renderGeoLang = placeName => {
   return `<h3 class="set-title title" data-place="${placeName}">${placeName}</h3>`;
 };
 
+const renderDetailWeather = (data, weathercode, day) => {
+  let gustMerkup = `<li class="indic-item">
+          Порив
+          <span class="indic-val">${data.wind.gust}</span>
+          <span class="unit">м&sol;с</span>
+        </li>`;
+
+  let timeSet = `<time class="day-time" datetime="${getCurrentTime()}">
+        ${getCurrentTime()}
+      </time>
+      <div class="sunrise-sunset-box">
+      <p class="sunrise">
+        Cхід 
+        <time class="sun-val" datetime="${getTime(data.sys.sunrise)}">
+          ${getTime(data.sys.sunrise)}
+        </time>
+      </p>
+      <p class="sunset">
+        Захід 
+        <time class="sun-val" datetime="${getTime(data.sys.sunset)}">
+          ${getTime(data.sys.sunset)}
+        </time>
+      </p>
+      </div>`;
+  if (!data.wind.gust) {
+    gustMerkup = '';
+  }
+  if (!data.sys.sunrise || !data.sys.sunrise) {
+    timeSet = '';
+  }
+  return `
+    <div class="base-day-info">
+      <h2 class="weekday">${day}</h2>
+      ${timeSet}
+    </div>
+    <div class="detail-weather">
+      <div class="temperature-wrapper">
+        <p class="temperature js-current-temp">${Math.round(data.main.temp)}</p>
+        <svg class="icon-weather" width="116" height="116">
+          <use href="./assets/icons.svg#${makeIconWeather(weathercode)}"></use>
+        </svg>
+      </div>
+      <ul class="indic-list">
+        <li class="indic-item">
+          Відчувається
+          <span class="indic-val">${Math.round(data.main.feels_like)}</span>
+          <span class="unit">&deg;</span>
+        </li>
+        <li class="indic-item">
+          Тиск
+          <span class="indic-val">${data.main.pressure}</span>
+          <span class="unit">мм рт. ст.</span>
+        </li>
+        <li class="indic-item">
+          Вологість
+          <span class="indic-val">${data.main.humidity}</span>
+          <span class="unit">&percnt;</span>
+        </li>
+        <li class="indic-item">
+          Швидкість вітру
+          <span class="indic-val">${data.wind.speed}</span>
+          <span class="unit">м&sol;с</span>
+        </li>
+        ${gustMerkup}
+        <li class="indic-item">
+          Напрям вітру
+          <span class="indic-val">${data.wind.deg}</span>
+          <span class="unit">&deg;</span>
+        </li>
+      </ul>
+    </div>`;
+};
+
 // Utils
+
+const getTime = time => {
+  const hours = new Date(time * 1000).getHours().toString(10).padStart(2, '0');
+  const minutes = new Date(time * 1000)
+    .getMinutes()
+    .toString(10)
+    .padStart(2, '0');
+  return `${hours}:${minutes}`;
+};
 
 const parseDayTimeChart = daytime => {
   const date = new Date(daytime);
@@ -789,6 +926,7 @@ const success = async position => {
   const res = await getNearestCities(...pos, APIkey);
   refs.mapTitle.textContent = await translateTxt(res.data.list[0].name);
   fetchPromises(...pos);
+  removeSaveLocalitySetting();
   await setSaveLocality(...pos);
   getSaveLocalityForSettings();
   refs.daysList.addEventListener('click', onClickBtnOpenChartHandler);
@@ -814,3 +952,5 @@ refs.sidebar.addEventListener('click', onClickBtnSidebarHandler);
 refs.modalform.addEventListener('input', _.debounce(inputCityHandler, 500));
 
 refs.showAllBtn.addEventListener('click', onClickShowAllCitiesHandler);
+
+refs.selecterBox.addEventListener('click', onClickBtnSelectDaysHandler);

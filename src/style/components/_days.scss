@@ -45,6 +45,15 @@
 
 .days-content-wrapper {
     position: relative;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.days-content-wrapper.current-content {
+    animation-name: opacity;
+    animation-duration: 1000ms;
+    animation-timing-function: $timeCubic;
+    animation-iteration-count: 1;
 }
 
 .days-list {
@@ -65,27 +74,42 @@
     animation-iteration-count: 1;
 }
 
-.days-item:first-child {
+.dark .indic-item {
+    color: $darkThemeThirdTextColor;
+}
+
+.days-item:first-child,
+.current-weather-box,
+.tomorrow-weather-box {
     width: 307px;
     background-color: $whiteThemeSecBgColor;
     border-radius: 20px;
     overflow: hidden;
 }
 
-.dark .days-item:first-child {
+.dark .days-item:first-child,
+.dark .current-weather-box,
+.dark .tomorrow-weather-box {
     background-color: $darkThemeCardFirstDayBgColor;
 }
 
-.paleblue .days-item:first-child {
+.paleblue .days-item:first-child,
+.paleblue .current-weather-box,
+.paleblue .tomorrow-weather-box {
     background-color: $paleblueThemeCardFirstDayBgColor;
 }
 
-.day-time-wrapper {
+.day-time-wrapper,
+.base-day-info {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 12px 22px 12px 20px;
     background-color: $whiteThemeHeadColor;
+}
+
+.base-day-info {
+    opacity: 0;
 }
 
 .day {
@@ -225,3 +249,87 @@
     transition-delay: 200ms;
 }
 
+// Today
+
+.current-weather-box,
+.tomorrow-weather-box {
+    position: absolute;
+    top: 33px;
+    left: 0;
+    width: 739px;
+    height: 295px;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.base-day-info {
+    gap: 42px;
+}
+
+.base-day-info {
+    margin-bottom: 40px;
+}
+
+.sunrise-sunset-box {
+    margin-left: auto;
+    font-weight: 600;
+}
+
+.detail-weather {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+    align-items: center;
+    gap: 130px;
+    font-size: 20px;
+    opacity: 0;
+
+    .temperature-wrapper {
+        margin: 0;
+        gap: 46px;
+
+        .temperature {
+        font-size: 64px;
+        }
+    }
+}
+
+.indic-list {
+    color: $whiteThemeSecTextColor;
+
+    .indic-item {
+        margin-bottom: 5px;
+    }
+
+    .indic-item:last-child {
+        margin: 0;
+    }
+}
+
+.indic-val {
+    color: $whiteThemeTitleColor;
+}
+
+.dark .indic-val {
+    color: $darkThemePrimaTextColor;
+}
+
+.current-content {
+    visibility: visible;
+    pointer-events: all;
+}
+
+.current-weather-box.current-content,
+.tomorrow-weather-box.current-content {
+    animation-name: stretch;
+    animation-duration: 500ms;
+    animation-timing-function: $timeCubic;
+    animation-iteration-count: 1;
+}
+
+.current-content .base-day-info,
+.current-content .detail-weather {
+    opacity: 1;
+    transition: opacity 250ms linear;
+    transition-delay: 500ms;
+}
