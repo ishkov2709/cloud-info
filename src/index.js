@@ -143,6 +143,7 @@ const fetchPromises = async (lat, lng) => {
   makeDetailWeatherTomorrow(lat, lng);
   makeNearestCities(lat, lng, APIkey);
   makeAllNearestCities(lat, lng, APIkey);
+  weatherNotify();
 };
 
 const getSaveLocalityForSettings = () => {
@@ -780,13 +781,13 @@ const sendNotification = (title, options) => {
   if (Notification.permission === 'granted') {
     setInterval(() => {
       const notification = new Notification(title, options);
-    }, 5000);
+    }, 6 * 60 * 60 * 1000);
   } else if (Notification.permission !== 'denied') {
     Notification.requestPermission().then(function (permission) {
       if (permission === 'granted') {
         setInterval(() => {
           const notification = new Notification(title, options);
-        }, 5000);
+        }, 6 * 60 * 60 * 1000);
       }
     });
   }
