@@ -18,6 +18,7 @@ import getDetailTemp from './modules/fetchDetailTemp';
 import descriptionWeather from './modules/descriptionWeather';
 import getDetailWeather from './modules/fetchDetailWeather';
 import getDetailWeatherTomorrow from './modules/fetchDetailWeatherTomorrow';
+import logo from './img/logo.png';
 
 // classes
 
@@ -210,6 +211,13 @@ const getWeatherChart = async ({ city, lat, lon }) => {
 
 // Makers
 
+const makeCorrectWeather = code => {
+  const res = descriptionWeather(code[1]);
+  if (res === 'Ясно') return 'ясна погода';
+  else if (res === 'Хмарно') return 'хмарна погода';
+  else return res.toLowerCase();
+};
+
 const activeContent = name => {
   refs.contentDaysArr.forEach(el => changeClassOnNode(el, name));
 };
@@ -231,7 +239,6 @@ const makeDetailCurrentDayWeather = async (lat, lon) => {
 
 const makeDetailWeatherTomorrow = async (lat, lon) => {
   const res = await getDetailWeatherTomorrow(lat, lon, APIkey);
-  console.log(res.data.list[11]);
   refs.tomorrow.innerHTML = renderDetailWeather(
     res.data.list[1],
     tomorrowCodeWeather,
@@ -476,6 +483,8 @@ const onClickBtnSidebarHandler = evt => {
   } else if (targetBtnData.includes('settings')) {
     addActiveClass(1);
     refs.themes.addEventListener('click', onClickBtnSwichThemeHandler);
+  } else if (targetBtnData.includes('notify')) {
+    weatherNotify();
   }
   refs.showAllBtn.addEventListener('click', onClickShowAllCitiesHandler);
 };
@@ -742,6 +751,46 @@ const renderDetailWeather = (data, weathercode, day) => {
 };
 
 // Utils
+
+const weatherNotify = async () => {
+  try {
+    const local = JSON.parse(localStorage.getItem('locality'));
+    const res = await getWeather(local.lat, local.lon);
+
+    let title = `Погода ${local.city}`;
+    const options = {
+      body: `Завтра очікується ${makeCorrectWeather(
+        res.data.daily.weathercode
+      )} з температурою близько ${Math.round(
+        res.data.daily.temperature_2m_max[1]
+      )}°C.`,
+      icon: logo,
+    };
+    sendNotification(title, options);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const sendNotification = (title, options) => {
+  if (!('Notification' in window)) {
+    Notiflix.Notify.failure('Сповіщення не підтримуються в цьому браузері');
+    return;
+  }
+  if (Notification.permission === 'granted') {
+    setInterval(() => {
+      const notification = new Notification(title, options);
+    }, 5000);
+  } else if (Notification.permission !== 'denied') {
+    Notification.requestPermission().then(function (permission) {
+      if (permission === 'granted') {
+        setInterval(() => {
+          const notification = new Notification(title, options);
+        }, 5000);
+      }
+    });
+  }
+};
 
 const getTime = time => {
   const hours = new Date(time * 1000).getHours().toString(10).padStart(2, '0');
