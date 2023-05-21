@@ -11,6 +11,12 @@
     transition: left 250ms $timeCubic, visibility 250ms $timeCubic;
 }
 
+@media screen and (max-width: 1279px) {
+    .backdrop {
+        position: fixed;
+    }
+}
+
 .dark .backdrop {
     background-color: $darkThemeBackdropBgColor;
 

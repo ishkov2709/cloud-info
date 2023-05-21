@@ -10,5 +10,27 @@
     gap: 20px;
 }
 
+@media screen and (max-width: 767px) {
+    .container {
+        box-sizing: border-box;
+        width: 320px;
+        padding: 0 12px;
+    }
 
+    .main-wrapper {
+        display: block;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .container {
+        width: 768px;
+    }
+}
+
+@media screen and (min-width: 1280px) {
+    .container {
+        width: 1280px;
+    }
+}
 

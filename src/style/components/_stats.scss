@@ -5,6 +5,27 @@
     border-radius: 20px;
 }
 
+@media screen and (max-width: 767px) {
+    .graphic-wrapper {
+        width: 296px;
+        font-size: 14px;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .graphic-wrapper {
+        width: 360px;
+        padding-left: 28px;
+    }
+}
+
+@media screen and (min-width: 1280px) {
+    .graphic-wrapper {
+        width: 413px;
+        padding-left: 12px;
+    }
+}
+
 .dark .graphic-wrapper {
     background-color: $darkThemeCardLastDaysBgColor;
 }
@@ -28,6 +49,13 @@
     font-size: 20px;
 }
 
+@media screen and (max-width: 767px) {
+    .humidity-item {
+    font-size: 14px;
+    font-weight: 600;
+    }
+}
+
 .humidity-item:last-child {
     margin-bottom: 0;
 }
@@ -35,8 +63,27 @@
 .stats-list {
     display: flex;
     justify-content: center;
-    gap: 30px;
     margin-left: 100px;
+}
+
+@media screen and (max-width: 767px) {
+    .stats-list {
+        gap: 16px;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .stats-list {
+        justify-content: flex-end;
+        gap: 22px;
+    }
+}
+
+@media screen and (min-width: 1280px) {
+    .stats-list {
+        justify-content: center;
+        gap: 30px;
+    }
 }
 
 .stats-item {

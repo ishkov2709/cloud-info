@@ -17,19 +17,21 @@
     color: $darkThemeTitleColor;
 }
 
+@media screen and (max-width: 767px) {
+    .btn-show-all {
+        display: none;
+    }
+}
+
 .cities-list {
-    width: 413px;
-    height: 443px;
     overflow-y: hidden;
 }
 
 .cities-item {
-    width: 413px;
-    height: 141px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 11px;
     padding: 14px 24px;
     background-color: $whiteThemeBgColor;
     border-radius: 20px;
@@ -49,6 +51,39 @@
 
 .cities-item:last-child {
     margin-bottom: 0;
+}
+
+@media screen and (max-width: 767px) {
+    .cities-list {
+        width: 296px;
+    }
+
+    .cities-item {
+        width: 296px;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .cities-list {
+        width: 360px;
+        height: 293px;
+    }
+
+    .cities-item {
+        width: 360px;
+    }
+}
+
+@media screen and (min-width: 1280px) {
+    .cities-list {
+        width: 413px;
+        height: 445px;
+    }
+
+    .cities-item {
+        width: 413px;
+        height: 141px;
+    }
 }
 
 .city {
@@ -127,6 +162,20 @@
 .more-wrapper.active .close-more-btn {
     visibility: visible;
     pointer-events: all;
+}
+
+@media screen and (max-width: 767px) {
+    .more-wrapper {
+        display: none;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .more-wrapper {
+        display: block;
+        position: fixed;
+        z-index: 1000;
+    }
 }
 
 .cities-list-wrapper {

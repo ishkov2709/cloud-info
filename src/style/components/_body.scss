@@ -20,6 +20,12 @@ header, footer {
     padding-top: 25px;
 }
 
+@media screen and (max-width: 767px) {
+    header, footer {
+    padding-top: 28px;
+    }
+}
+
 main {
     position: relative;
     overflow: hidden;
@@ -31,4 +37,10 @@ svg {
 
 .dark svg {
     fill: $darkThemePrimaTextColor;
+}
+
+@media screen and (max-width: 767px) {
+    body.is-hidden {
+        overflow: hidden;
+    }
 }

@@ -75,6 +75,7 @@ const optionsGeo = {
 
 // Variables
 
+let positionY = 0;
 let todayCodeWeather;
 let tomorrowCodeWeather;
 
@@ -89,9 +90,43 @@ const sortDays = arr => {
 
 sortDays(daysOfWeek);
 
-// СSS decoration
+/**
+  |============================
+  | MediaQuery
+  |============================
+*/
 
-[...refs.humidityList.children].forEach(el => el.append(dashedline(18)));
+const mediaQuery = window.matchMedia('(max-width: 1279px)');
+
+const onScrollPageHideTitleHandler = () => {
+  if (window.pageYOffset > positionY) refs.mapTitle.style.display = 'none';
+  else refs.mapTitle.style.display = 'block';
+  positionY = window.pageYOffset;
+};
+
+const handleMediaQueryChange = mediaQuery => {
+  [...refs.humidityList.children].forEach(el => {
+    if (el.firstElementChild && el.firstElementChild.tagName === 'UL')
+      el.firstElementChild.remove();
+  });
+  if (mediaQuery.matches) {
+    [...refs.humidityList.children].forEach(el => el.append(dashedline(12)));
+    window.addEventListener(
+      'scroll',
+      _.throttle(onScrollPageHideTitleHandler, 300)
+    );
+  } else {
+    [...refs.humidityList.children].forEach(el => el.append(dashedline(18)));
+    window.removeEventListener(
+      'scroll',
+      _.throttle(onScrollPageHideTitleHandler, 300)
+    );
+  }
+};
+
+mediaQuery.addListener(handleMediaQueryChange);
+
+handleMediaQueryChange(mediaQuery);
 
 // Scrollbar
 
@@ -287,6 +322,7 @@ const setSaveLocality = async (lat, lon, place) => {
 };
 
 const addActiveClass = num => {
+  refs.body.classList.add('is-hidden');
   refs.backdrop.classList.add('active');
   refs.backdrop.children[num].classList.add('active');
 };
@@ -457,6 +493,30 @@ const checkGeolocation = () => {
   }
 };
 
+const detectBtn = btn => {
+  if (btn.includes('search')) {
+    refs.sidebar.classList.remove('open');
+    addActiveClass(0);
+    refs.searchList.addEventListener(
+      'click',
+      onClickItemCityFetchWeatherDataHandler
+    );
+    refs.modalform.addEventListener('submit', onSubmitFormHandler);
+  } else if (btn.includes('location')) {
+    navigator.geolocation.getCurrentPosition(success, error, optionsGeo);
+  } else if (btn.includes('settings')) {
+    addActiveClass(1);
+    refs.sidebar.classList.remove('open');
+    refs.themes.addEventListener('click', onClickBtnSwichThemeHandler);
+  } else if (btn.includes('notify')) {
+    weatherNotify();
+  } else if (btn.includes('arrow')) {
+    refs.sidebar.classList.toggle('open');
+    refs.backdrop.addEventListener('click', onClickCloseBackdropHandler);
+  }
+  refs.showAllBtn.addEventListener('click', onClickShowAllCitiesHandler);
+};
+
 /**
   |============================
   | Handlers
@@ -467,27 +527,16 @@ const onClickBtnSidebarHandler = evt => {
   if (!evt.target.closest('.side-btn')) return;
   const targetBtnData = Object.keys(evt.target.closest('.side-btn').dataset);
   const current = new CurrentBtn('current-btn');
-  if (targetBtnData.join('') === Object.keys(current.btn.dataset).join(''))
+  if (targetBtnData.includes('main')) return location.reload();
+  if (
+    targetBtnData.join('') === Object.keys(current.btn.dataset).join('') &&
+    !targetBtnData.includes('arrow')
+  )
     return;
   removeAllListeners();
   removeActiveClass();
   appointCurrentBtn(evt, 'current-btn', 'side-btn');
-  if (targetBtnData.includes('search')) {
-    addActiveClass(0);
-    refs.searchList.addEventListener(
-      'click',
-      onClickItemCityFetchWeatherDataHandler
-    );
-    refs.modalform.addEventListener('submit', onSubmitFormHandler);
-  } else if (targetBtnData.includes('location')) {
-    navigator.geolocation.getCurrentPosition(success, error, optionsGeo);
-  } else if (targetBtnData.includes('settings')) {
-    addActiveClass(1);
-    refs.themes.addEventListener('click', onClickBtnSwichThemeHandler);
-  } else if (targetBtnData.includes('notify')) {
-    weatherNotify();
-  }
-  refs.showAllBtn.addEventListener('click', onClickShowAllCitiesHandler);
+  detectBtn(targetBtnData);
 };
 
 const inputCityHandler = async evt => {
@@ -571,6 +620,13 @@ const onClickBtnSelectDaysHandler = ({ target }) => {
     prevCurrent.btn.classList.remove('current');
     target.classList.add('current');
     activeContent(target.name);
+  }
+};
+
+const onClickCloseBackdropHandler = evt => {
+  if (evt.currentTarget === evt.target) {
+    removeActiveClass();
+    refs.backdrop.removeEventListener('click', onClickCloseBackdropHandler);
   }
 };
 
@@ -753,6 +809,12 @@ const renderDetailWeather = (data, weathercode, day) => {
 
 // Utils
 
+const smoothScroll = event => {
+  document.documentElement.scrollIntoView({
+    behavior: 'smooth',
+  });
+};
+
 const weatherNotify = async () => {
   try {
     const local = JSON.parse(localStorage.getItem('locality'));
@@ -915,6 +977,7 @@ const removeTheme = () => {
 };
 
 const removeActiveClass = () => {
+  refs.body.classList.remove('is-hidden');
   const activeClassEls = document.querySelectorAll('.active');
   if (activeClassEls.length) {
     activeClassEls.forEach(el => el.classList.remove('active'));
@@ -1004,3 +1067,5 @@ refs.modalform.addEventListener('input', _.debounce(inputCityHandler, 500));
 refs.showAllBtn.addEventListener('click', onClickShowAllCitiesHandler);
 
 refs.selecterBox.addEventListener('click', onClickBtnSelectDaysHandler);
+
+window.addEventListener('scroll', smoothScroll);

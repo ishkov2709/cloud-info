@@ -6,6 +6,12 @@
     transition: visibility 250ms $timeCubic, opacity 250ms $timeCubic;
 }
 
+@media screen and (max-width: 767px) {
+    .modal-search {
+    padding-top: 60px;
+    }
+}
+
 .modal-search.active {
     pointer-events: all;
     visibility: visible;
@@ -32,6 +38,22 @@
     border: none;
     border-radius: 25px;
     outline: none;
+}
+
+.search-item {
+    padding: 28px 24px;
+}
+
+
+@media screen and (max-width: 767px) {
+    .input-search,
+    .search-item {
+        width: 320px;
+    }
+
+    .search-item {
+    padding: 22px 18px;
+    }
 }
 
 .dark .input-search,
@@ -61,6 +83,14 @@
     margin: 0 auto 24px auto;
     font-size: 20px;
     background-color: $whiteThemeSearchItemsColor;
+}
+
+@media screen and (max-width: 767px) {
+    .search-item {
+        margin: 0 auto 20px auto;
+        font-size: 18px;
+        background-color: $whiteThemeSearchItemsColor;
+    }
 }
 
 .dark .search-item{

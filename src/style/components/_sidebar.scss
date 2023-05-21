@@ -7,6 +7,20 @@
     border-radius: 20px;
 }
 
+@media screen and (max-width: 1279px) {
+    .sidebar {
+        position: fixed;
+        top: 50%;
+        left: -88px;
+        transform: translateY(-50%);
+        z-index: 10000;
+        transition: left 250ms $timeCubic;
+    }
+    .sidebar.open {
+        left: 4px;
+    }
+}
+
 .dark .sidebar {
     background-color: $darkThemeSidebarBgColor;
 }
@@ -15,12 +29,41 @@
     background-color: $paleblueThemeSidebarBgColor;
 }
 
-nav {
-    margin-bottom: auto;
+
+@media screen and (max-width: 767px) {
+    nav {
+        margin-bottom: 12px;
+    }   
 }
 
-.top-side-item:not(:last-child) {
-    margin-bottom: 24px;
+@media screen and (min-width: 768px) {
+    nav {
+        margin-bottom: 14px;
+    } 
+}
+
+@media screen and (min-width: 1280px) {
+    nav {
+        margin-bottom: auto;
+    }   
+}
+
+@media screen and (max-width: 767px) {
+    .top-side-item:not(:last-child) {
+    margin-bottom: 10px;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .top-side-item:not(:last-child) {
+        margin-bottom: 12px
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .top-side-item:not(:last-child) {
+        margin-bottom: 24px;
+    }
 }
 
 .side-btn {
@@ -67,4 +110,33 @@ nav {
 
 .current-btn.reject {
     color: $rejectColor;
+}
+
+@media screen and (max-width: 1279px) {
+    .side-btn.btn-close {
+        position: absolute;
+        top: 50%;
+        right: -35px;
+        transform: translateY(-50%);
+        display: block;
+        border: none;
+        background: transparent;
+        color: $whiteThemePrimaTextColor;
+    }
+
+    .dark .side-btn.btn-close {
+        color: $darkThemeTitleColor;
+    }
+
+    .open .side-btn.btn-close {
+        transform: translateY(-50%) rotate(180deg);
+    }
+}
+
+.side-btn.btn-close {
+    display: none;
+}
+
+.side-btn.btn-close {
+    color: $whiteThemePrimaTextColor;
 }

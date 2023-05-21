@@ -6,6 +6,33 @@ main {
     row-gap: 24px;
 }
 
+@media screen and (max-width: 767px) {
+    main {
+        display: block;
+    } 
+}
+
+@media screen and (min-width: 768px) {
+    main {
+        justify-content: center;
+        column-gap: 19px;
+    } 
+}
+
+@media screen and (max-width: 1279px) {
+    main {
+        position: static;
+    } 
+}
+
+@media screen and (min-width: 1280px) {
+    main {
+        position: relative;
+        justify-content: flex-start;
+        column-gap: 20px;
+    } 
+}
+
 .title {
     display: inline-block;
     padding: 2px 10px;
@@ -19,4 +46,52 @@ main {
 .dark .title {
     color: $darkThemeTitleColor;
     border-color: $darkThemeTitleColor;
+}
+
+@media screen and (max-width: 767px) {
+    .section-days,
+    .section-stats,
+    .section-map {
+        margin-bottom: 30px;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .section-days {
+        position: relative;
+        order: 0;
+    }
+
+    .section-stats {
+        order: 1;
+    }
+
+    .section-nearest-cities {
+        width: 360px;
+        order: 2;
+    }
+    
+    .section-map {
+        order: 3;
+    }
+}
+
+@media screen and (min-width: 1280px) {
+    .section-days {
+        position: static;
+        order: 0;
+    }
+
+    .section-stats {
+        order: 1;
+    }
+
+    .section-nearest-cities {
+        width: 413px;
+        order: 3;
+    }
+    
+    .section-map {
+        order: 2;
+    }
 }

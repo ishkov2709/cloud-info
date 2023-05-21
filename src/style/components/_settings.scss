@@ -17,6 +17,14 @@
     transition: visibility 250ms $timeCubic, opacity 250ms $timeCubic;
 }
 
+@media screen and (max-width: 767px) {
+    .modal-settings {
+        width: 320px;
+        height: 420px;
+        padding: 50px;
+    }
+}
+
 .dark .modal-settings {
     background-color: $darkThemeModalSetBgColor;
 }
@@ -41,6 +49,29 @@
     text-align: center;
 }
 
+@media screen and (max-width: 767px) {
+    .geo-lang-list {
+        display: block;
+        margin-bottom: 40px;
+    }
+
+    .geo-lang-item {
+        display: flex;
+        gap: 6px;
+        width: auto;
+        max-width: 160px;
+        margin: 0 auto;
+
+        .set-title:first-child {
+            font-weight: 600;
+        }
+    }
+
+    .geo-lang-item:not(:last-child) {
+            margin-bottom: 10px;
+        }
+}
+
 .set-title {
     padding: 2px 24px;
 }
@@ -54,6 +85,12 @@
     display: flex;
     justify-content: center;
     gap: 42px;
+}
+
+@media screen and (max-width: 767px) {
+    .theme-list {
+    gap: 22px;
+}
 }
 
 .theme-btn {

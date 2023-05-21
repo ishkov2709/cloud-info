@@ -8,8 +8,43 @@
     border: none;
 }
 
+@media screen and (max-width: 767px) {
+    .map-title {
+        display: none;
+    }
+
+    .location-title {
+        display: block;
+        width: 100%;
+        position: fixed;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        border: none;
+        border-radius: 0;
+        background-color: $whiteThemeBtnColor;
+        font-size: 18px;
+        font-weight: 600;
+        text-align: center;
+        z-index: 1000;
+    }
+}
+
 #map {
     width: 739px; 
     height: 445px;
     border-radius: 10px;
+}
+
+@media screen and (max-width: 767px) {
+    #map {
+        width: 296px;
+        height: 340px;
+    }
+}
+
+@media screen and (max-width: 1279px) {
+    #map {
+        pointer-events: none;
+    }
 }
