@@ -122,8 +122,8 @@
 .more-wrapper {
     position: absolute;
     top: 0;
-    right: -413px;
-    width: 413px;
+    right: -415px;
+    width: 415px;
     height: 100%;
     padding: 10px 5px 10px 0;
     background-color: $whiteThemeSecBgColor;
@@ -175,6 +175,12 @@
         display: block;
         position: fixed;
         z-index: 1000;
+    }
+}
+
+@media screen and (min-width: 1280px) {
+    .more-wrapper {
+        position: absolute;
     }
 }
 
