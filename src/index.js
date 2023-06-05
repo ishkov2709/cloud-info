@@ -527,7 +527,6 @@ const onClickBtnSidebarHandler = evt => {
   if (!evt.target.closest('.side-btn')) return;
   const targetBtnData = Object.keys(evt.target.closest('.side-btn').dataset);
   const current = new CurrentBtn('current-btn');
-  if (targetBtnData.includes('main')) return location.reload();
   if (
     targetBtnData.join('') === Object.keys(current.btn.dataset).join('') &&
     !targetBtnData.includes('arrow')
