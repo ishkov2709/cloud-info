@@ -54,7 +54,14 @@
     color: $darkThemeTitleColor;
 }
 
-.days-content-wrapper {
+@media screen and (max-width: 767px) {
+    .days-content-wrapper {
+    position: relative;
+    visibility: visible;
+    pointer-events: all;
+    }
+}
+    .days-content-wrapper {
     position: relative;
     visibility: hidden;
     pointer-events: none;
@@ -301,6 +308,17 @@
     justify-content: center;
     visibility: hidden;
     pointer-events: none;
+}
+
+@media screen and (max-width: 767px) {
+    .days-list.js-days-list.hidden {
+        opacity: 1;
+    }
+    
+    .hidden + .chart-container {
+    visibility: hidden;
+    pointer-events: none;
+    }
 }
 
 .hidden + .chart-container {
