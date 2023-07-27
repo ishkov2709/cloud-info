@@ -47,3 +47,5 @@ export const getTime = time => {
     .padStart(2, '0');
   return `${hours}:${minutes}`;
 };
+
+const isNumeric = n => n.split('').some(el => Number(el));

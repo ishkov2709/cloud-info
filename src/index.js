@@ -356,13 +356,12 @@ const makeWeatherDays = async (lat, lon) => {
 const makeCitiesByInpuValue = async input => {
   try {
     const response = await getLocality(input, 'ua', 3);
-    if (!response.data.length)
-      return Notiflix.Notify.warning(
-        'На ваш запит немає відповідного результату. Будь ласка, спробуйте ще раз'
-      );
+    if (!response.data.length) throw new Error();
     return response.data;
   } catch (error) {
-    console.log(error);
+    Notiflix.Notify.warning(
+      'На ваш запит немає відповідного результату. Будь ласка, спробуйте ще раз'
+    );
   }
 };
 
@@ -540,10 +539,11 @@ const onClickBtnSidebarHandler = evt => {
 
 const inputCityHandler = async evt => {
   const val = evt.target.value.toLowerCase().trim();
-  if (!val) return (refs.searchList.innerHTML = '');
+  if (!val) return;
+  refs.searchList.innerHTML = '';
 
   const locality = await makeCitiesByInpuValue(val);
-  refs.searchList.innerHTML = locality.map(renderSearch).join('');
+  if (locality) refs.searchList.innerHTML = locality.map(renderSearch).join('');
 };
 
 const onSubmitFormHandler = evt => {
@@ -719,8 +719,6 @@ const appointCurrentBtn = (evt, prevEl, currentEl) => {
 };
 
 // Calc Foo
-
-const isNumeric = n => n.split('').some(el => Number(el));
 
 const setMapTitleVal = async el => {
   const place = await translateTxt(
