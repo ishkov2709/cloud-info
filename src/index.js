@@ -819,6 +819,7 @@ const success = async position => {
 
 const error = error => {
   addRejectLight();
+  removeSaveLocalitySetting();
   getSaveLocalityForSettings();
   getSaveLocalityForBaseFetch();
   Notiflix.Notify.failure('Не вдалось отримати геодані');
